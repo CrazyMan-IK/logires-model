@@ -38,7 +38,7 @@ public class Canvas
 	public string StringValue()
 	{
 		Sort();
-		var matrix = new string[Size.Y, Size.X];
+		var matrix = new Cell[Size.Y, Size.X];
 		var cmatrix = new List<Color>[Size.Y, Size.X];
 
 		foreach (var (z, item) in _items)
@@ -82,7 +82,7 @@ public class Canvas
 		//Console.WriteLine(matrix.Cast<string>().ToList().GetType());
 
 		//return "";
-		return string.Join("\n", matrix.GetRows().Select((row) => string.Join("", row)));
+		return string.Join("\n", matrix.GetRows().Select((row) => string.Join("", row.Select(c => c?.StringValue() ?? ""))));
 	}
 
 	private void Sort()
@@ -95,65 +95,75 @@ public class Canvas
 		return x < Size.X || _canOverflow;
 	}
 
-	private void Draw(IFigure item, string[,] matrix, List<Color>[,] cmatrix, string str, int x, int y)
+	private void Draw(IFigure item, Cell[,] matrix, List<Color>[,] cmatrix, string str, int x, int y)
 	{
 		if (y < 0 || (y > Size.Y - 1 && !_canOverflow))
 		{
 		  return;
 		}
 		
-		var i = x;
 		if (x > 0)
 		{
 			for (int i = x; i > 0; i--)
 			{
-		    if (!matrix[y, i] && IsInBounds(i))
+		    if (matrix[y, i] == null && IsInBounds(i))
 		    {
-		      matrix[y, i] = ' ';
+		      matrix[y, i] = new Cell(' ');
 		    }
 		  }
 		}
 
-		for (const chr of str)
+		foreach (var chr in str)
 		{
-      if (!IsInBounds(i))
+      if (!IsInBounds(x))
       {
         break;
       }
 
-      var chCodeA = chr.charCodeAt(0);
-      var chCodeB = (matrix[y][i] ?? '\u2800').charCodeAt(0);
+      //var chCodeA = (int)chr;//chr.charCodeAt(0);
+      //var chCodeB = (matrix[y, x]?.GetCharCode() ?? 0x2800);//.charCodeAt(0);
+			var oldChr = matrix[y, x]?.Char ?? '\u2800';
 
-      var result = '';
-      if (chCodeA >= 0x2800 && chCodeA <= 0x28ff && chCodeB >= 0x2800 && chCodeB <= 0x28ff)
+      var result = new Cell();
+      if (chr >= 0x2800 && chr <= 0x28ff && oldChr >= 0x2800 && oldChr <= 0x28ff)
       {
-        if (chCodeB !== 0x2800 && isObjectImplementFilledFigure(item) && item.isFilled)
+        if (oldChr != 0x2800 && item is IFilledFigure fitem && fitem.IsFilled)
         {
-          //const isInside = item.isInside.bind(item);
-
-          const dots = getDotsPositionsInCell(i, y);
-          const chCodeC =
+          var dots = Cell.GetDotsPositions(new Vector2Int(x, y));
+					result.Merge((char)(chr - 0x2800), (a, b, index) => {
+						return false;
+					});
+					result.Merge(matrix[y, x], (a, b, index) => {
+						return fitem.IsInside(dots[7 - index]);
+					});
+          /*const chCodeC =
             0x2800 +
             applyPredicateToDots(chCodeA - 0x2800, (chCodeA | chCodeB) - 0x2800, (a, b, index) => {
               //if (chCodeB !== 0x2800) console.log({ a, b, index, ii: isInside(dots[7 - index]) }); //, dots });
-              return item.isInside(dots[7 - index]);
+              return fitem.IsInside(dots[7 - index]);
             });
           //if (chCodeB !== 0x2800) console.log({ ac: chCodeA.toString(16), bc: chCodeB.toString(16) });
 
-          result = String.fromCharCode(chCodeC);
-        } else {
-          result = String.fromCharCode(chCodeA | chCodeB);
+          result = String.fromCharCode(chCodeC);*/
         }
-      } else {
-        result = chr;
+        else
+        {
+          result.Char = (char)(chr | oldChr);
+        }
+      }
+      else
+      {
+        result.Char = chr;
       }
 
-      matrix[y][i] = result;
+      //result = chr;
 
-      if (chCodeA !== 0x2800)
+      matrix[y, x] = result;
+
+      //if (chCodeA !== 0x2800)
       {
         //console.log(`"${result}" "x: ${i}"\t"y: ${y}"\t"${JSON.stringify(item.color)}"`);
-        cmatrix[y][i].push(item.color);
+        cmatrix[y, x].Add(item.Color);
       }
 
       /*if (item.isInside({ x: i, y: y })) {
@@ -162,7 +172,7 @@ public class Canvas
         matrix[y][i] = String.fromCharCode(chCodeA | chCodeB);
       }*/
 
-      i++;
+      x++;
     }
 	}
 }
