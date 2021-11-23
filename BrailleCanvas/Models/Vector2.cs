@@ -18,6 +18,23 @@ public struct Vector2 : IReadOnlyVector2<float>
 	public float X { get; set; } = 0;
 	public float Y { get; set; } = 0;
 
+	public IReadOnlyVector2<float> Add(IReadOnlyVector2<float> b)
+    {
+		return new Vector2(X + b.X, Y + b.Y);
+    }
+	public IReadOnlyVector2<float> Subtract(IReadOnlyVector2<float> b)
+    {
+		return new Vector2(X - b.X, Y - b.Y);
+    }
+    public IReadOnlyVector2<float> Multiply(float b)
+    {
+		return new Vector2(X * b, Y * b);
+    }
+    public IReadOnlyVector2<float> Divide(float b)
+    {
+		return new Vector2(X / b, Y / b);
+	}
+
 	public override string ToString()
 	{
 		return $"X: {X}, Y: {Y}";
@@ -39,7 +56,24 @@ public struct Vector2Int : IReadOnlyVector2<int>
 	
 	public int X { get; set; } = 0;
 	public int Y { get; set; } = 0;
-	
+
+	public IReadOnlyVector2<int> Add(IReadOnlyVector2<int> b)
+	{
+		return new Vector2Int(X + b.X, Y + b.Y);
+	}
+	public IReadOnlyVector2<int> Subtract(IReadOnlyVector2<int> b)
+	{
+		return new Vector2Int(X - b.X, Y - b.Y);
+	}
+	public IReadOnlyVector2<int> Multiply(float b)
+	{
+		return new Vector2Int((int)MathF.Round(X * b), (int)MathF.Round(Y * b));
+	}
+	public IReadOnlyVector2<int> Divide(float b)
+	{
+		return new Vector2Int((int)MathF.Round(X / b), (int)MathF.Round(Y / b));
+	}
+
 	public override string ToString()
 	{
 	  return $"X: {X}, Y: {Y}";
