@@ -160,14 +160,14 @@ public class Line : IFigure
             _result += '\n';
         }
 
-        Console.WriteLine(bbox);
+        //Console.WriteLine(bbox);
 
         var pointsList = points.ToList();
         var accum = 0;
         for (float i = 0; i <= pointsList.Count - 1; i += Constants.FigureTimeStep)
         {
             var point = GetPoint(pointsList, i);
-            Console.WriteLine(point);
+            //Console.WriteLine(point);
             //const curY = lerp(start.y, end.y, i);
 
             if (point.X < 0 || point.Y < 0)
@@ -175,15 +175,15 @@ public class Line : IFigure
                 continue;
             }
 
-            var rX = MathF.Round(point.X, 4);
-            var rY = MathF.Round(point.Y, 4);
-            Console.WriteLine(new Vector2(rX - 0.5f, rY - 0.5f));
+            var rX = MathExtensions.Round(point.X, 4);
+            var rY = MathExtensions.Round(point.Y, 4);
+            //Console.WriteLine(new Vector2(rX - 0.5f, rY - 0.5f));
 
             accum |= (int)(new Cell(new Vector2(rX - 0.5f, rY - 0.5f)).State);
 
-            var cellX = MathF.Max(MathF.Round(rX), 0);
-            var cellY = MathF.Max(MathF.Round(rY), 0);
-            Console.WriteLine(new Vector2(cellX, cellY));
+            var cellX = MathF.Max(MathExtensions.Round(rX), 0);
+            var cellY = MathF.Max(MathExtensions.Round(rY), 0);
+            //Console.WriteLine(new Vector2(cellX, cellY));
 
             var index = (int)MathF.Truncate(cellX + cellY * (cSizeX + 1 + cPositionX) + cellY);
 
@@ -214,6 +214,6 @@ public class Line : IFigure
         var p1 = points[(int)MathF.Floor(i)];
         var p2 = points[(int)MathF.Floor(i) + 1];
 
-        return Vector2Extensions.Lerp(p1, p2, MathExtensions.Mod(i, (1 + Constants.FigureTimeStep)));
+        return Vector2Extensions.Lerp(p1, p2, MathExtensions.Mod(i, 1 + Constants.FigureTimeStep));
     }
 }

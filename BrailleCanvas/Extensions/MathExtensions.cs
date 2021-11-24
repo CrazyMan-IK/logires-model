@@ -9,4 +9,19 @@ public static class MathExtensions
     {
         return a - b * MathF.Floor(a / b);
     }
+
+    public static float Lerp(float a, float b, float t)
+    {
+        return a + (b - a) * t;
+    }
+
+    public static float Round(float value)
+    {
+        return MathF.Round(value, MidpointRounding.AwayFromZero);
+    }
+
+    public static float Round(float value, int digits)
+    {
+        return MathF.Round(value, digits, MidpointRounding.AwayFromZero);
+    }
 }

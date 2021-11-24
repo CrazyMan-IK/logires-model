@@ -146,6 +146,10 @@ public class Canvas
                     {
                         return fitem.IsInside(dots[7 - index]);
                     });
+                    /*result.Merge((char)0xff, (a, b, index) =>
+                    {
+                        return fitem.IsInside(dots[7 - index]);
+                    });*/
                     /*const chCodeC =
                       0x2800 +
                       applyPredicateToDots(chCodeA - 0x2800, (chCodeA | chCodeB) - 0x2800, (a, b, index) => {

@@ -1,3 +1,5 @@
+using BrailleCanvas.Extensions;
+
 namespace BrailleCanvas.Models;
 
 public struct Color
@@ -20,7 +22,7 @@ public struct Color
 
 	public string AsEscapeSequence()
   {
-		return $"\x1b[38;2;{(int)MathF.Round(R)};{(int)MathF.Round(G)};{(int)MathF.Round(B)}m";
+		return $"\x1b[38;2;{(int)MathExtensions.Round(R)};{(int)MathExtensions.Round(G)};{(int)MathExtensions.Round(B)}m";
 	}
 
 	public override string ToString()

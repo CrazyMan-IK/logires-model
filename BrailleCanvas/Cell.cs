@@ -93,7 +93,8 @@ public class Cell
             throw new InvalidOperationException();
         }
 
-        Merge((char)other.State, predicate);
+        //Merge((char)other.State, predicate);
+        Merge((char)(State | other.State), predicate);
     }
 
     public void Merge(char other, Func<bool, bool, int, bool> predicate)
@@ -120,7 +121,8 @@ public class Cell
         c >>= 1;
         //console.log(c);
 
-        State = (CellState)c;
+        //State = (CellState)c;
+        Char = (char)(c + 0x2800);
     }
 
     public int GetCharCode()

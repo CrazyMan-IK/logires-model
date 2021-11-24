@@ -1,3 +1,4 @@
+using BrailleCanvas.Extensions;
 using BrailleCanvas.Interfaces;
 
 namespace BrailleCanvas.Models;
@@ -67,11 +68,11 @@ public struct Vector2Int : IReadOnlyVector2<int>
 	}
 	public IReadOnlyVector2<int> Multiply(float b)
 	{
-		return new Vector2Int((int)MathF.Round(X * b), (int)MathF.Round(Y * b));
+		return new Vector2Int((int)MathExtensions.Round(X * b), (int)MathExtensions.Round(Y * b));
 	}
 	public IReadOnlyVector2<int> Divide(float b)
 	{
-		return new Vector2Int((int)MathF.Round(X / b), (int)MathF.Round(Y / b));
+		return new Vector2Int((int)MathExtensions.Round(X / b), (int)MathExtensions.Round(Y / b));
 	}
 
 	public override string ToString()
