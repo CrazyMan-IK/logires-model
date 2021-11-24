@@ -19,19 +19,32 @@ public struct Color
 	}
 
 	public string AsEscapeSequence()
-    {
+  {
 		return $"\x1b[38;2;{(int)MathF.Round(R)};{(int)MathF.Round(G)};{(int)MathF.Round(B)}m";
+	}
+
+	public override string ToString()
+	{
+		return $"R: {R}, G: {G}, B: {B}";
 	}
 
 	public static Color MixColors(IEnumerable<Color> colors)
 	{
-		var count = colors.Count();
 		var acc = new Color();
+		
+    //Console.WriteLine("|------------|");
 
+		int count = 0;
 		foreach (var color in colors)
-        {
+    {
+      //Console.WriteLine(color);
+      //Console.WriteLine(color.AsRYB());
 			acc += color.AsRYB();
-        }
+			count++;
+    }
+
+    //Console.WriteLine();
+    //Console.WriteLine(acc);
 
 		acc /= count;
 
@@ -66,7 +79,7 @@ public struct Color
 	}
 
 	private Color AsRYB()
-    {
+  {
 		var newColor = new Color(R, G, B);
 
 		var w = MathF.Min(MathF.Min(newColor.R, newColor.G), newColor.B);
@@ -79,10 +92,10 @@ public struct Color
 		newColor.G -= y;
 
 		if (newColor.G != 0 && newColor.B != 0)
-        {
+    {
 			newColor.G /= 2;
 			newColor.B /= 2;
-        }
+    }
 
 		y += newColor.G;
 		newColor.B += newColor.G;
@@ -91,18 +104,18 @@ public struct Color
 
 		var my = MathF.Max(MathF.Max(newColor.R, newColor.G), newColor.B);
 		if (my != 0)
-        {
+    {
 			var n = mg / my;
 			newColor *= n;
-        }
+    }
 
 		newColor += w;
 
 		return newColor;
-    }
+  }
 
 	private Color AsRGB()
-    {
+  {
 		var newColor = new Color(R, G, B);
 
 		var w = MathF.Min(MathF.Min(newColor.R, newColor.G), newColor.B);
@@ -115,10 +128,10 @@ public struct Color
 		newColor.B -= g;
 
 		if (newColor.G != 0 && newColor.B != 0)
-        {
-			newColor.G *= 2;
-			newColor.B *= 2;
-        }
+    {
+		  newColor.G *= 2;
+		  newColor.B *= 2;
+    }
 
 		newColor.R += newColor.G;
 		g += newColor.G;
@@ -127,13 +140,13 @@ public struct Color
 
 		var mg = MathF.Max(MathF.Max(newColor.R, newColor.G), newColor.B);
 		if (mg != 0)
-        {
-			var n = my / mg;
-			newColor *= n;
-        }
+    {
+		  var n = my / mg;
+		  newColor *= n;
+    }
 
 		newColor += w;
 
 		return newColor;
-    }
+  }
 }

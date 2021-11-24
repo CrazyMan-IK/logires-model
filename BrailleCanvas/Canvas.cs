@@ -170,7 +170,7 @@ public class Canvas
 
             matrix[y, x] = result;
 
-            //if (chCodeA !== 0x2800)
+            if (chr != 0x2800)
             {
                 //console.log(`"${result}" "x: ${i}"\t"y: ${y}"\t"${JSON.stringify(item.color)}"`);
                 cmatrix[y, x].Add(item.Color);
