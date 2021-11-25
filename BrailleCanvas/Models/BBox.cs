@@ -9,6 +9,6 @@ public struct BBox
 
     public override string ToString()
     {
-    	return $"Min: {{{Min}}}, Max: {{{Max}}}";
+        return $"Min: {{{Min}}}, Max: {{{Max}}}";
     }
 }

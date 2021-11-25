@@ -25,7 +25,7 @@ public static class MathExtensions
         return MathF.Round(value, digits, MidpointRounding.AwayFromZero);
     }
 
-    /*public static int Max(params IEnumerable<int> values)
+    public static int Max(params int[] values)
     {
     	var max = int.MinValue;
     	
@@ -38,5 +38,5 @@ public static class MathExtensions
     	}
 
     	return max;
-    }*/
+    }
 }

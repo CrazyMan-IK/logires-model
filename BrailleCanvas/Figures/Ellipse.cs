@@ -1,6 +1,6 @@
-using BrailleCanvas.Models;
-using BrailleCanvas.Interfaces;
 using BrailleCanvas.Extensions;
+using BrailleCanvas.Interfaces;
+using BrailleCanvas.Models;
 
 namespace BrailleCanvas.Figures;
 
@@ -136,17 +136,17 @@ public class Ellipse : IFilledFigure
                 _result += '\u2800';
             }
             _result += '\n';
-		}
+        }
 
-		size *= 0.5f;
+        size *= 0.5f;
 
-		var accum = 0;
+        var accum = 0;
         for (float i = 0; i <= 1; i += Constants.FigureTimeStep)
         {
             var rad = MathExtensions.Lerp(0, MathF.Tau, i);
             var curX = position.X + size.X + MathF.Sin(rad) * size.X;
             var curY = position.Y + size.Y + MathF.Cos(rad) * -size.Y;
-			var point = new Vector2(curX, curY);
+            var point = new Vector2(curX, curY);
 
             if (point.X < 0 || point.Y < 0)
             {
@@ -166,7 +166,7 @@ public class Ellipse : IFilledFigure
             //const index = Math.trunc(cellX + cellY * (size.x * 2 + 1) + cellY);
             var oldCode = _result[index] - 0x2800;
             var old = oldCode >= 0x00 && oldCode <= 0xff ? oldCode : 0;
-			//Console.WriteLine(new { curX, curY, cellX, cellY, index, old, oldCode, accum });
+            //Console.WriteLine(new { curX, curY, cellX, cellY, index, old, oldCode, accum });
             //Console.WriteLine();
             accum |= old;
             _result = _result.ReplaceAt(index, (char)(0x2800 + accum));

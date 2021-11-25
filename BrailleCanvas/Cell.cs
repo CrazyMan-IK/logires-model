@@ -1,7 +1,7 @@
-using System;
-using BrailleCanvas.Models;
-using BrailleCanvas.Interfaces;
 using BrailleCanvas.Extensions;
+using BrailleCanvas.Interfaces;
+using BrailleCanvas.Models;
+using System;
 
 namespace BrailleCanvas;
 

@@ -1,6 +1,6 @@
-using BrailleCanvas.Models;
-using BrailleCanvas.Interfaces;
 using BrailleCanvas.Extensions;
+using BrailleCanvas.Interfaces;
+using BrailleCanvas.Models;
 
 namespace BrailleCanvas;
 
@@ -20,8 +20,8 @@ public class Canvas
 
     public void Clear()
     {
-    	_items.Clear();
-    	_topZ = 0;
+        _items.Clear();
+        _topZ = 0;
     }
 
     public void Append(IFigure item)

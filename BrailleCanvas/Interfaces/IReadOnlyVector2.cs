@@ -2,8 +2,8 @@ namespace BrailleCanvas.Interfaces;
 
 public interface IReadOnlyVector2<T>
 {
-	T X { get; }
-	T Y { get; }
+    T X { get; }
+    T Y { get; }
 
     IReadOnlyVector2<T> Add(IReadOnlyVector2<T> b);
     IReadOnlyVector2<T> Subtract(IReadOnlyVector2<T> b);

@@ -7,9 +7,9 @@ function replaceAt(str: string, index: number, replacement: string): string {
   return str.substr(0, index) + replacement + str.substr(index + replacement.length);
 }*/
 
-using BrailleCanvas.Models;
-using BrailleCanvas.Interfaces;
 using BrailleCanvas.Extensions;
+using BrailleCanvas.Interfaces;
+using BrailleCanvas.Models;
 
 namespace BrailleCanvas.Figures;
 
@@ -119,18 +119,18 @@ public class Line : IFigure
       return this._result;
     }*/
 
-    private char[] _result = null;
+    private char[] _result = Array.Empty<char>();
     private int _oldPointsHash = 0;
 
     public Line(IEnumerable<IReadOnlyVector2<float>> points, Color color)
     {
-    		Points = points;
+        Points = points;
         Color = color;
 
         Size = Vector2.Zero;
         Position = Vector2.Zero;
     }
-    
+
     public IEnumerable<IReadOnlyVector2<float>> Points { get; private set; }
     public IReadOnlyVector2<float> Size { get; private set; }
     public IReadOnlyVector2<float> Position { get; private set; }
@@ -139,12 +139,12 @@ public class Line : IFigure
 
     public string StringValue()
     {
-    		var newHash = GetPointsHashCode();
-    
+        var newHash = GetPointsHashCode();
+
         if (_oldPointsHash != newHash)
         {
-        	_oldPointsHash = newHash;
-          Update();
+            _oldPointsHash = newHash;
+            Update();
         }
 
         //Update();
@@ -154,11 +154,11 @@ public class Line : IFigure
 
     private int GetPointsHashCode()
     {
-    	return Points.Aggregate(0, (acc, p) => acc + p.GetHashCode());
+        return Points.Aggregate(0, (acc, p) => acc + p.GetHashCode());
     }
 
-		private void Update()
-		{
+    private void Update()
+    {
         var bbox = Points.Aggregate(new BBox(), (acc, p) =>
         {
             var newMin = new Vector2(Math.Min(p.X, acc.Min.X), Math.Min(p.Y, acc.Min.Y));
@@ -185,18 +185,21 @@ public class Line : IFigure
         var cSizeX = (int)MathF.Ceiling(Size.X);
         var cSizeY = (int)MathF.Ceiling(Size.Y);
 
-				var aSizeX = cSizeX + 1 + cPositionX;
-				var aSizeY = cSizeY + 2 + cPositionY;
-				
-				_result = new char[aSizeX * aSizeY];
+        var aSizeX = cSizeX + 2 + cPositionX;
+        var aSizeY = cSizeY + 1 + cPositionY;
+
+        _result = new char[aSizeX * aSizeY];
         for (int i = 0; i < aSizeY; i++)
         {
             for (int j = 0; j < aSizeX - 1; j++)
             {
-                _result[j + i * aSizeX + i] = '\u2800'; //filled && this.isInside({ x: j, y: i })
+                _result[i * aSizeX + j] = '\u2800'; //filled && this.isInside({ x: j, y: i })
             }
-            _result[aSizeX - 1] = '\n';
+            _result[i * aSizeX + (aSizeX - 1)] = '\n';
         }
+
+        //row * rows + column
+        //i * aSizeY + j
 
         //Console.WriteLine(bbox);
 
