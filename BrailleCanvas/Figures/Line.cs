@@ -119,13 +119,47 @@ public class Line : IFigure
       return this._result;
     }*/
 
-    private string _result = "";
+    private char[] _result = null;
+    private int _oldPointsHash = 0;
 
     public Line(IEnumerable<IReadOnlyVector2<float>> points, Color color)
     {
+    		Points = points;
         Color = color;
 
-        var bbox = points.Aggregate(new BBox(), (acc, p) =>
+        Size = Vector2.Zero;
+        Position = Vector2.Zero;
+    }
+    
+    public IEnumerable<IReadOnlyVector2<float>> Points { get; private set; }
+    public IReadOnlyVector2<float> Size { get; private set; }
+    public IReadOnlyVector2<float> Position { get; private set; }
+    public int? ZIndex { get; private set; }
+    public Color Color { get; private set; }
+
+    public string StringValue()
+    {
+    		var newHash = GetPointsHashCode();
+    
+        if (_oldPointsHash != newHash)
+        {
+        	_oldPointsHash = newHash;
+          Update();
+        }
+
+        //Update();
+
+        return string.Join("", _result);
+    }
+
+    private int GetPointsHashCode()
+    {
+    	return Points.Aggregate(0, (acc, p) => acc + p.GetHashCode());
+    }
+
+		private void Update()
+		{
+        var bbox = Points.Aggregate(new BBox(), (acc, p) =>
         {
             var newMin = new Vector2(Math.Min(p.X, acc.Min.X), Math.Min(p.Y, acc.Min.Y));
             var newMax = new Vector2(Math.Max(p.X, acc.Max.X), Math.Max(p.Y, acc.Max.Y));
@@ -145,24 +179,28 @@ public class Line : IFigure
         Position = bbox.Min;
         Size = new Vector2(MathF.Abs(bbox.Max.X - bbox.Min.X), MathF.Abs(bbox.Max.Y - bbox.Min.Y));
 
-        var cPositionX = MathF.Ceiling(Position.X);
-        var cPositionY = MathF.Ceiling(Position.Y);
+        var cPositionX = (int)MathF.Ceiling(Position.X);
+        var cPositionY = (int)MathF.Ceiling(Position.Y);
 
-        var cSizeX = MathF.Ceiling(Size.X);
-        var cSizeY = MathF.Ceiling(Size.Y);
+        var cSizeX = (int)MathF.Ceiling(Size.X);
+        var cSizeY = (int)MathF.Ceiling(Size.Y);
 
-        for (int i = 0; i < cSizeY + 1 + cPositionY; i++)
+				var aSizeX = cSizeX + 1 + cPositionX;
+				var aSizeY = cSizeY + 2 + cPositionY;
+				
+				_result = new char[aSizeX * aSizeY];
+        for (int i = 0; i < aSizeY; i++)
         {
-            for (int j = 0; j < cSizeX + 1 + cPositionX; j++)
+            for (int j = 0; j < aSizeX - 1; j++)
             {
-                _result += '\u2800'; //filled && this.isInside({ x: j, y: i })
+                _result[j + i * aSizeX + i] = '\u2800'; //filled && this.isInside({ x: j, y: i })
             }
-            _result += '\n';
+            _result[aSizeX - 1] = '\n';
         }
 
         //Console.WriteLine(bbox);
 
-        var pointsList = points.ToList();
+        var pointsList = Points.ToList();
         var accum = 0;
         for (float i = 0; i <= pointsList.Count - 1; i += Constants.FigureTimeStep)
         {
@@ -193,20 +231,10 @@ public class Line : IFigure
             //console.log({ curX, curY, cellX, cellY, index, old, oldCode, accum }
             //console.log();
             accum |= old;
-            _result = _result.ReplaceAt(index, (char)(0x2800 + accum));
+            _result[index] = (char)(0x2800 + accum);
 
             accum = 0;
         }
-    }
-
-    public IReadOnlyVector2<float> Size { get; private set; }
-    public IReadOnlyVector2<float> Position { get; private set; }
-    public int? ZIndex { get; private set; }
-    public Color Color { get; private set; }
-
-    public string StringValue()
-    {
-        return _result;
     }
 
     private IReadOnlyVector2<float> GetPoint(List<IReadOnlyVector2<float>> points, float i)

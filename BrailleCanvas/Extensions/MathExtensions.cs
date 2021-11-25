@@ -24,4 +24,19 @@ public static class MathExtensions
     {
         return MathF.Round(value, digits, MidpointRounding.AwayFromZero);
     }
+
+    /*public static int Max(params IEnumerable<int> values)
+    {
+    	var max = int.MinValue;
+    	
+    	foreach (var value in values)
+    	{
+    		if (value > max)
+    		{
+    			max = value;
+    		}
+    	}
+
+    	return max;
+    }*/
 }

@@ -18,6 +18,12 @@ public class Canvas
 
     public IReadOnlyVector2<int> Size { get; private set; }
 
+    public void Clear()
+    {
+    	_items.Clear();
+    	_topZ = 0;
+    }
+
     public void Append(IFigure item)
     {
         int z;

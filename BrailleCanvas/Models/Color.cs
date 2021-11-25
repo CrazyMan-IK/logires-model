@@ -80,6 +80,8 @@ public struct Color
 		return new Color(a.R / b, a.G / b, a.B / b);
 	}
 
+	public static Color White => new Color(255, 255, 255);
+
 	private Color AsRYB()
   {
 		var newColor = new Color(R, G, B);
