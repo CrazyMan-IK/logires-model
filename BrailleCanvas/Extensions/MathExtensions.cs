@@ -25,9 +25,9 @@ public static class MathExtensions
         return MathF.Round(value, digits, MidpointRounding.AwayFromZero);
     }
 
-    public static int Max(params int[] values)
+    public static float Max(params float[] values)
     {
-    	var max = int.MinValue;
+    	var max = float.MinValue;
     	
     	foreach (var value in values)
     	{

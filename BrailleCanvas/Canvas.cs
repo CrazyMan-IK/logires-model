@@ -1,6 +1,7 @@
+using System.Text;
+using BrailleCanvas.Models;
 using BrailleCanvas.Extensions;
 using BrailleCanvas.Interfaces;
-using BrailleCanvas.Models;
 
 namespace BrailleCanvas;
 
@@ -40,7 +41,7 @@ public class Canvas
         _items.Add((z, item));
     }
 
-    public string StringValue()
+    public ReadOnlySpan<byte> StringValue()
     {
         Sort();
         var matrix = new Cell[Size.Y, Size.X];
@@ -96,7 +97,11 @@ public class Canvas
         //Console.WriteLine(matrix.Cast<string>().ToList().GetType());
 
         //return "";
-        return string.Join("\n", matrix.GetRows().Select((row) => string.Join("", row.Select(c => c?.StringValue() ?? ""))));
+        //var res = string.Join("\n", matrix.GetRows().Select((row) => string.Join("", row.Select(c => c?.StringValue() ?? ""))));
+        var res = matrix.GetRows().SelectMany((row) => Encoding.UTF8.GetBytes(row.SelectMany(c => c?.StringValue() ?? "").Append('\n').ToArray()));
+
+        var span = new ReadOnlySpan<byte>(res.ToArray());
+        return span;
     }
 
     private void Sort()

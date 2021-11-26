@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using BrailleCanvas;
+using BrailleCanvas.Extensions;
 using BrailleCanvas.Figures;
 using BrailleCanvas.Interfaces;
 using BrailleCanvas.Models;
@@ -16,6 +17,7 @@ var hcolumns = columns / 2;
 var c = new Canvas(new Vector2Int(columns, rows));
 
 var t = 0f;
+var dt = 0f;
 var p1 = new RefVector2();
 var p2 = new RefVector2();
 var p3 = new RefVector2();
@@ -24,10 +26,11 @@ var p4 = new RefVector2();
 var plist1 = new List<IReadOnlyVector2<float>> { p1, p2 };
 var plist2 = new List<IReadOnlyVector2<float>> { p3, p4 };
 
-float UpdateVectors()
+void UpdateVectors()
 {
     var oldT = t;
     t = ((float)DateTime.Now.TimeOfDay.TotalSeconds) / 2;
+    dt = MathExtensions.Lerp(dt, t - oldT, 0.5f);
 
     p1.X = hcolumns + MathF.Sin(t) * hcolumns;
     p1.Y = hrows + MathF.Cos(t) * hrows;
@@ -40,8 +43,6 @@ float UpdateVectors()
 
     p4.X = hcolumns + MathF.Cos(t + MathF.PI) * hcolumns;
     p4.Y = hrows + MathF.Sin(t + MathF.PI) * hrows;
-
-    return t - oldT;
 }
 UpdateVectors();
 
@@ -83,7 +84,7 @@ c.Append(frame);
 using var stdout = Console.OpenStandardOutput(columns * rows);
 while (true)
 {
-    var dt = UpdateVectors();
+    UpdateVectors();
     /*var ln1 = new Line(new List<IReadOnlyVector2<float>> { new Vector2(1, 1), new Vector2(columns - 1, rows - 1) }, new Color(255, 0, 0));
     var ln2 = new Line(new List<IReadOnlyVector2<float>> { new Vector2(1, rows - 1), new Vector2(columns - 1, 1) }, new Color(0, 0, 255));*/
 
@@ -92,6 +93,6 @@ while (true)
     Console.SetCursorPosition(0, 0);
 
     //Console.WriteLine(c.StringValue());
-    //Console.WriteLine(1 / dt);
-    stdout.Write(c.StringValue().AsSpan());
+    stdout.Write(c.StringValue());
+    Console.WriteLine(1 / dt);
 }
