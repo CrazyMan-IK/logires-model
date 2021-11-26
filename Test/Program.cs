@@ -1,8 +1,9 @@
+using System;
+using System.Text;
 using BrailleCanvas;
 using BrailleCanvas.Figures;
 using BrailleCanvas.Interfaces;
 using BrailleCanvas.Models;
-using System.Text;
 
 Console.OutputEncoding = System.Text.Encoding.UTF8;
 
@@ -79,6 +80,7 @@ c.Append(ln2);
 c.Append(el1);
 c.Append(frame);
 
+using var stdout = Console.OpenStandardOutput(columns * rows);
 while (true)
 {
     var dt = UpdateVectors();
@@ -89,6 +91,7 @@ while (true)
 
     Console.SetCursorPosition(0, 0);
 
-    Console.WriteLine(c.StringValue());
-    Console.WriteLine(1 / dt);
+    //Console.WriteLine(c.StringValue());
+    //Console.WriteLine(1 / dt);
+    stdout.Write(c.StringValue().AsSpan());
 }
