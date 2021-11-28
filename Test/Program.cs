@@ -37,7 +37,7 @@ static extern void ReturnCursorToZero();
 void UpdateVectors()
 {
     var oldT = t;
-    t = ((float)DateTime.Now.TimeOfDay.TotalSeconds) / 4;
+    t = ((float)DateTime.Now.TimeOfDay.TotalSeconds) / 2;
     dt = MathExtensions.Lerp(dt, t - oldT, 0.5f);
 
     p1.X = hcolumns + MathF.Sin(t) * hcolumns;
