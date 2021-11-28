@@ -81,6 +81,11 @@ public class Cell
         };
     }
 
+    public void Clear()
+    {
+    	Char = '\u2800';
+    }
+
     public void Merge(Cell other, Func<bool, bool, int, bool> predicate)
     {
         if (other == null)

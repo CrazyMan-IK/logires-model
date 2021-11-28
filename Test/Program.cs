@@ -1,5 +1,7 @@
 using System;
 using System.Text;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 using BrailleCanvas;
 using BrailleCanvas.Extensions;
 using BrailleCanvas.Figures;
@@ -25,6 +27,12 @@ var p4 = new RefVector2();
 
 var plist1 = new List<IReadOnlyVector2<float>> { p1, p2 };
 var plist2 = new List<IReadOnlyVector2<float>> { p3, p4 };
+
+[DllImport("test.dll", EntryPoint="write")]
+static extern void Write(string str);
+
+[DllImport("test.dll", EntryPoint="returnCursorToZero")]
+static extern void ReturnCursorToZero();
 
 void UpdateVectors()
 {
@@ -81,7 +89,7 @@ c.Append(ln2);
 c.Append(el1);
 c.Append(frame);
 
-using var stdout = Console.OpenStandardOutput(columns * rows);
+//using var stdout = Console.OpenStandardOutput(columns * rows);
 while (true)
 {
     UpdateVectors();
@@ -90,9 +98,13 @@ while (true)
 
     //c.Clear();
 
-    Console.SetCursorPosition(0, 0);
-
     //Console.WriteLine(c.StringValue());
-    stdout.Write(c.StringValue());
-    Console.WriteLine(1 / dt);
+    //stdout.Write(c.StringValue());
+    //Debug.WriteLine(c.StringValue());
+    Write(c.StringValue());
+    Write("\n" + (1 / dt).ToString());
+    //Console.WriteLine(1 / dt);
+    //Console.SetCursorPosition(0, 0);
+    //Write("\033[0;0H");
+    ReturnCursorToZero();
 }

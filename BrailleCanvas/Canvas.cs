@@ -10,6 +10,8 @@ public class Canvas
     private readonly List<(int, IFigure)> _items = new List<(int, IFigure)>();
     private int _topZ = 0;
     private bool _canOverflow = false;
+    private Cell[,] _matrix = null;
+    private List<Color>[,] _cmatrix = null;
 
     public Canvas(IReadOnlyVector2<int> size, bool canOverflow = false)
     {
@@ -41,17 +43,33 @@ public class Canvas
         _items.Add((z, item));
     }
 
-    public ReadOnlySpan<byte> StringValue()
+    //public ReadOnlySpan<byte> StringValue()
+    public string StringValue()
     {
         Sort();
-        var matrix = new Cell[Size.Y, Size.X];
-        var cmatrix = new List<Color>[Size.Y, Size.X];
-        for (int i = 0; i < cmatrix.GetLength(0); i++)
+        if (_matrix == null)
         {
-            for (int j = 0; j < cmatrix.GetLength(1); j++)
+        	_matrix = new Cell[Size.Y, Size.X];
+        	_cmatrix = new List<Color>[Size.Y, Size.X];
+        	for (int i = 0; i < _matrix.GetLength(0); i++)
+        	{
+            for (int j = 0; j < _matrix.GetLength(1); j++)
             {
-                cmatrix[i, j] = new List<Color>();
+                _matrix[i, j] = new Cell();
+                _cmatrix[i, j] = new List<Color>();
             }
+        	}
+        }
+        else
+        {
+        	for (int i = 0; i < _matrix.GetLength(0); i++)
+        	{
+        	  for (int j = 0; j < _matrix.GetLength(1); j++)
+        	  {
+        	  	_matrix[i, j].Clear();
+        	  	_cmatrix[i, j].Clear();
+        		}
+        	}
         }
 
         foreach (var (z, item) in _items)
@@ -64,20 +82,20 @@ public class Canvas
 
             foreach (var line in lines)
             {
-                Draw(item, matrix, cmatrix, line, 0, y++);
+                Draw(item, _matrix, _cmatrix, line, 0, y++);
             }
         }
 
-        for (int y = 0; y < matrix.GetLength(0); y++)
+        /*for (int y = 0; y < _matrix.GetLength(0); y++)
         {
-            for (int x = 0; x < matrix.GetLength(1); x++)
+            for (int x = 0; x < _matrix.GetLength(1); x++)
             {
-                if (matrix[y, x] == null)
+                if (_matrix[y, x] == null)
                 {
                     continue;
                 }
 
-                var colors = cmatrix[y, x];
+                var colors = _cmatrix[y, x];
                 var color = Color.MixColors(colors);
                 //var color = colors[0];
 
@@ -85,10 +103,10 @@ public class Canvas
                 {
                     //console.log(getColorEscapeCharacter(color));
                     //matrix[y][x] = getColorEscapeCharacter(color) + matrix[y][x];
-                    matrix[y, x].Color = color;
+                    _matrix[y, x].Color = color;
                 }
             }
-        }
+        }*/
 
         //var tst = from item in matrix
         //					select item;
@@ -97,11 +115,12 @@ public class Canvas
         //Console.WriteLine(matrix.Cast<string>().ToList().GetType());
 
         //return "";
-        //var res = string.Join("\n", matrix.GetRows().Select((row) => string.Join("", row.Select(c => c?.StringValue() ?? ""))));
-        var res = matrix.GetRows().SelectMany((row) => Encoding.UTF8.GetBytes(row.SelectMany(c => c?.StringValue() ?? "").Append('\n').ToArray()));
+        return string.Join("\n", _matrix.GetRows().Select((row) => string.Join("", row.Select(c => c?.StringValue() ?? ""))));
+
+        /*var res = matrix.GetRows().SelectMany((row) => Encoding.UTF8.GetBytes(row.SelectMany(c => c?.StringValue() ?? "").Append('\n').ToArray()));
 
         var span = new ReadOnlySpan<byte>(res.ToArray());
-        return span;
+        return span;*/
     }
 
     private void Sort()
@@ -143,7 +162,8 @@ public class Canvas
             //var chCodeB = (matrix[y, x]?.GetCharCode() ?? 0x2800);//.charCodeAt(0);
             var oldChr = matrix[y, x]?.Char ?? '\u2800';
 
-            var result = new Cell();
+            var result = matrix[y, x];
+            result.Clear();
             if (chr >= 0x2800 && chr <= 0x28ff && oldChr >= 0x2800 && oldChr <= 0x28ff)
             {
                 if (oldChr != 0x2800 && item is IFilledFigure fitem && fitem.IsFilled)
@@ -153,7 +173,7 @@ public class Canvas
                     {
                         return false;
                     });
-                    result.Merge(matrix[y, x], (a, b, index) =>
+                    result.Merge((char)(oldChr - 0x2800), (a, b, index) =>
                     {
                         return fitem.IsInside(dots[7 - index]);
                     });
