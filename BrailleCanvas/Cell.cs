@@ -104,20 +104,25 @@ public class Cell
 
     public void Merge(char other, Func<bool, bool, int, bool> predicate)
     {
-        if (State == CellState.UNKNOWN)
-        {
-            throw new InvalidOperationException();
-        }
+				if (State == CellState.UNKNOWN)
+				{
+					throw new InvalidOperationException();
+				}
+				 
+				var a = (int)State;
+				var b = (int)other;
+    
+        Char = Merge(a, b, predicate);
+    }
 
-        var a = (int)State;
-        var b = (int)other;
-
+    public static char Merge(int first, int second, Func<bool, bool, int, bool> predicate)
+    {
         var c = 0;
 
         for (int i = 7; i >= 0; i--)
         {
-            var bitA = (a >> i) & 1; //a & (1 << i);
-            var bitB = (b >> i) & 1; //b & (1 << i);
+            var bitA = (first >> i) & 1; //a & (1 << i);
+            var bitB = (second >> i) & 1; //b & (1 << i);
 
             c |= predicate(bitA != 0, bitB != 0, i) ? bitA : bitB;
             //console.log(c.toString(2));
@@ -127,7 +132,7 @@ public class Cell
         //console.log(c);
 
         //State = (CellState)c;
-        Char = (char)(c + 0x2800);
+        return (char)(c + 0x2800);
     }
 
     public int GetCharCode()

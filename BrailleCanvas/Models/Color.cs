@@ -87,7 +87,9 @@ public struct Color
         var newColor = new Color(R, G, B);
 
         var w = MathF.Min(MathF.Min(newColor.R, newColor.G), newColor.B);
-        newColor -= w;
+        newColor.R -= w;
+        newColor.G -= w;
+        newColor.B -= w;
 
         var mg = MathF.Max(MathF.Max(newColor.R, newColor.G), newColor.B);
 
@@ -110,10 +112,14 @@ public struct Color
         if (my != 0)
         {
             var n = mg / my;
-            newColor *= n;
+            newColor.R *= n;
+            newColor.G *= n;
+            newColor.B *= n;
         }
 
-        newColor += w;
+        newColor.R += w;
+        newColor.G += w;
+        newColor.B += w;
 
         return newColor;
     }
@@ -123,7 +129,9 @@ public struct Color
         var newColor = new Color(R, G, B);
 
         var w = MathF.Min(MathF.Min(newColor.R, newColor.G), newColor.B);
-        newColor -= w;
+        newColor.R -= w;
+        newColor.G -= w;
+        newColor.B -= w;
 
         var my = MathF.Max(MathF.Max(newColor.R, newColor.G), newColor.B);
 
@@ -146,10 +154,14 @@ public struct Color
         if (mg != 0)
         {
             var n = my / mg;
-            newColor *= n;
+            newColor.R *= n;
+            newColor.G *= n;
+            newColor.B *= n;
         }
 
-        newColor += w;
+        newColor.R += w;
+        newColor.G += w;
+        newColor.B += w;
 
         return newColor;
     }
