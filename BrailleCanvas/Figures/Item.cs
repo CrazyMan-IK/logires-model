@@ -25,7 +25,7 @@ public class Item : IFilledFigure
 
     public string StringValue()
     {
-        var newHash = HashCode.Combine(Text, Position);
+        var newHash = Text.GetHashCode();
 
         if (_oldHash != newHash)
         {

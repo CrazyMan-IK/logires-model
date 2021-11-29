@@ -9,6 +9,14 @@ using BrailleCanvas.Interfaces;
 using BrailleCanvas.Models;
 
 Console.OutputEncoding = System.Text.Encoding.UTF8;
+Console.CursorVisible = false;
+AppDomain.CurrentDomain.ProcessExit += OnExit;
+Console.CancelKeyPress += OnExit;
+
+static void OnExit(object sender, EventArgs e)
+{
+	Console.CursorVisible = true;
+}
 
 var rows = 20;
 var columns = 76;
@@ -20,6 +28,8 @@ var c = new Canvas(new Vector2Int(columns, rows));
 
 var t = 0f;
 var dt = 0f;
+var frames = 0;
+var totalFPS = 0f;
 var p1 = new RefVector2();
 var p2 = new RefVector2();
 var p3 = new RefVector2();
@@ -28,16 +38,10 @@ var p4 = new RefVector2();
 var plist1 = new List<IReadOnlyVector2<float>> { p1, p2 };
 var plist2 = new List<IReadOnlyVector2<float>> { p3, p4 };
 
-[DllImport("test.dll", EntryPoint="write")]
-static extern void Write(string str);
-
-[DllImport("test.dll", EntryPoint="returnCursorToZero")]
-static extern void ReturnCursorToZero();
-
 void UpdateVectors()
 {
     var oldT = t;
-    t = ((float)DateTime.Now.TimeOfDay.TotalSeconds) / 2;
+    t = ((float)DateTime.Now.TimeOfDay.TotalSeconds);
     dt = MathExtensions.Lerp(dt, t - oldT, 0.5f);
 
     p1.X = hcolumns + MathF.Sin(t) * hcolumns;
@@ -51,6 +55,9 @@ void UpdateVectors()
 
     p4.X = hcolumns + MathF.Cos(t + MathF.PI) * hcolumns;
     p4.Y = hrows + MathF.Sin(t + MathF.PI) * hrows;
+
+    frames++;
+    totalFPS += (1 / dt);
 }
 UpdateVectors();
 
@@ -65,10 +72,11 @@ string CreateFrame()
     builder.Append(new string('-', xCount));
     builder.Append("+\n");
 
+		var empty = new string('\u2800', xCount);
     for (int i = 0; i < yCount; i++)
     {
         builder.Append('|');
-        builder.Append(new string('\u2800', xCount));
+        builder.Append(empty);
         builder.Append("|\n");
     }
 
@@ -98,13 +106,16 @@ while (true)
 
     //c.Clear();
 
-    //Console.WriteLine(c.StringValue());
+    Console.WriteLine(c.StringValue());
+    Console.WriteLine(MathExtensions.Round(1 / dt));
+    Console.WriteLine(frames);
+    //Console.WriteLine(totalFPS);
+    //Console.WriteLine(totalFPS / frames);
+    Console.WriteLine(MathExtensions.Round(totalFPS / frames));
+    Console.WriteLine();
+    Console.SetCursorPosition(0, 0);
+
     //stdout.Write(c.StringValue());
     //Debug.WriteLine(c.StringValue());
-    Write(c.StringValue());
-    Write("\n" + (1 / dt).ToString());
-    //Console.WriteLine(1 / dt);
-    //Console.SetCursorPosition(0, 0);
     //Write("\033[0;0H");
-    ReturnCursorToZero();
 }

@@ -10,25 +10,28 @@ public class Canvas
     private readonly List<(int, IFigure)> _items = new List<(int, IFigure)>();
     private int _topZ = 0;
     private bool _canOverflow = false;
-    private string[,] _matrix = null;
-    private List<Color>[,] _cmatrix = null;
+    private (List<Color>, char)[,] _matrix = null;
+    //private List<Color>[,] _cmatrix = null;
+    private StringBuilder _result = null;
 
     public Canvas(IReadOnlyVector2<int> size, bool canOverflow = false)
     {
         Size = size;
         _canOverflow = canOverflow;
 
-        _matrix = new string[Size.Y, Size.X];
-        _cmatrix = new List<Color>[Size.Y, Size.X];
+        _matrix = new (List<Color>, char)[Size.Y, Size.X];
+        //_cmatrix = new List<Color>[Size.Y, Size.X];
 
         for (int i = 0; i < _matrix.GetLength(0); i++)
         {
           for (int j = 0; j < _matrix.GetLength(1); j++)
           {
-            _matrix[i, j] = "\u2800";
-        		_cmatrix[i, j] = new List<Color>();
+            _matrix[i, j] = (new List<Color>(), '\u2800');
+        		//_cmatrix[i, j] = new List<Color>();
         	}
         }
+
+        _result = new StringBuilder((Size.X * Size.Y) * 2);
     }
 
     public IReadOnlyVector2<int> Size { get; private set; }
@@ -63,8 +66,8 @@ public class Canvas
         {
           for (int j = 0; j < _matrix.GetLength(1); j++)
           {
-          	_matrix[i, j] = "\u2800";
-          	_cmatrix[i, j].Clear();
+          	_matrix[i, j].Item1.Clear();
+          	_matrix[i, j].Item2 = '\u2800';
         	}
         }
 
@@ -78,30 +81,34 @@ public class Canvas
 
             foreach (var line in lines)
             {
-                Draw(item, _matrix, _cmatrix, line, 0, y++);
+                Draw(item, _matrix, line, 0, y++);
             }
         }
 
+        _result.Clear();
         for (int y = 0; y < _matrix.GetLength(0); y++)
         {
             for (int x = 0; x < _matrix.GetLength(1); x++)
             {
-                if (_matrix[y, x] == null)
+                if (_matrix[y, x].Item2 == '\u2800')
                 {
+                		_result.Append(_matrix[y, x].Item2);
                     continue;
                 }
 
-                var colors = _cmatrix[y, x];
-                var color = Color.MixColors(colors);
+                var color = Color.MixColors(_matrix[y, x].Item1);
                 //var color = colors[0];
 
-                if (colors.Count > 0)
+                //if (colors.Count > 0)
                 {
                     //console.log(getColorEscapeCharacter(color));
                     //matrix[y][x] = getColorEscapeCharacter(color) + matrix[y][x];
-                    _matrix[y, x] = color.AsEscapeSequence() + _matrix[y, x];
+                    _result.Append(color.AsEscapeSequence());
+                    _result.Append(_matrix[y, x].Item2);
                 }
             }
+
+            _result.Append('\n');
         }
 
         //var tst = from item in matrix
@@ -111,8 +118,10 @@ public class Canvas
         //Console.WriteLine(matrix.Cast<string>().ToList().GetType());
 
         //return "";
-        return string.Join("\n", _matrix.GetRows().Select((row) => string.Join("", row)));
+        //return string.Join("\n", _matrix.GetRows().Select((row) => string.Join("", row)));
 
+				return _result.ToString();
+				
         /*var res = matrix.GetRows().SelectMany((row) => Encoding.UTF8.GetBytes(row.SelectMany(c => c?.StringValue() ?? "").Append('\n').ToArray()));
 
         var span = new ReadOnlySpan<byte>(res.ToArray());
@@ -129,23 +138,23 @@ public class Canvas
         return x < Size.X || _canOverflow;
     }
 
-    private void Draw(IFigure item, string[,] matrix, List<Color>[,] cmatrix, string str, int x, int y)
+    private void Draw(IFigure item, (List<Color>, char)[,] matrix, string str, int x, int y)
     {
         if (y < 0 || (y > Size.Y - 1 && !_canOverflow))
         {
             return;
         }
 
-        if (x > 0)
+        /*if (x > 0)
         {
             for (int i = x; i > 0; i--)
             {
-                if (string.IsNullOrEmpty(matrix[y, i]) && IsInBounds(i))
+                if (matrix[y, i].Item2 == '\0' && IsInBounds(i))
                 {
-                    matrix[y, i] = "\u2800";
+                    matrix[y, i].Item2 = '\u2800';
                 }
             }
-        }
+        }*/
 
         foreach (var chr in str)
         {
@@ -156,7 +165,7 @@ public class Canvas
 
             //var chCodeA = (int)chr;//chr.charCodeAt(0);
             //var chCodeB = (matrix[y, x]?.GetCharCode() ?? 0x2800);//.charCodeAt(0);
-            var oldChr = matrix[y, x][0];
+            var oldChr = matrix[y, x].Item2;
 
             var result = '\0';
             if (chr >= 0x2800 && chr <= 0x28ff && oldChr >= 0x2800 && oldChr <= 0x28ff)
@@ -196,12 +205,12 @@ public class Canvas
 
             //result = chr;
 
-            matrix[y, x] = result.ToString();
+            matrix[y, x].Item2 = result;
 
             if (chr != 0x2800)
             {
                 //console.log(`"${result}" "x: ${i}"\t"y: ${y}"\t"${JSON.stringify(item.color)}"`);
-                cmatrix[y, x].Add(item.Color);
+                matrix[y, x].Item1.Add(item.Color);
             }
 
             /*if (item.isInside({ x: i, y: y })) {
