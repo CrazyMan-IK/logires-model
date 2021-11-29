@@ -6,113 +6,6 @@ namespace BrailleCanvas.Figures;
 
 public class Ellipse : IFilledFigure
 {
-    /*
-	private _result = '';
-	  private _width = 0;
-	  private _height = 0;
-	  private _position: Vector2 = { x: 0, y: 0 };
-	  private _zIndex: Auto = auto;
-	  private _isFilled = true;
-	  private _color: Color = white;
-	
-	  public get width(): number {
-	    return Math.ceil(this._width);
-	  }
-	
-	  public get height(): number {
-	    return Math.ceil(this._height);
-	  }
-	
-	  public get position(): Vector2 {
-	    return { x: Math.ceil(this._position.x), y: Math.ceil(this._position.y) };
-	  }
-	
-	  public get zIndex(): number | Auto {
-	    return this._zIndex;
-	  }
-	
-	  public get isFilled(): boolean {
-	    return this._isFilled;
-	  }
-	
-	  public get color(): Color {
-	    return this._color;
-	  }
-	
-	  public constructor(position: Vector2, size: Vector2, filled = true, color = white) {
-	    this._isFilled = filled;
-	    this._color = color;
-	    //console.log(end);
-	
-	    const cPositionX = Math.ceil(position.x);
-	    const cPositionY = Math.ceil(position.y);
-	
-	    const cSizeX = Math.ceil(size.x);
-	    const cSizeY = Math.ceil(size.y);
-	
-	    this._position = position;
-	
-	    this._width = size.x;
-	    this._height = size.y;
-	
-	    for (let i = 0; i < cSizeY + 1 + cPositionY; i++) {
-	      for (let j = 0; j < cSizeX + 1 + cPositionX; j++) {
-	        this._result += '\u2800'; //filled && this.isInside({ x: j, y: i }) ? ' ' : '\u2800';
-	      }
-	      this._result += '\n';
-	    }
-	
-	    //console.log(this._result.length);
-	
-	    size.x *= 0.5;
-	    size.y *= 0.5;
-	
-	    //let prevX = 0;
-	    //let prevY = 0;
-	    //const prevIndex = -1;
-	    let accum = 0;
-	    for (let i = 0; i <= 1; i += figureTStep) {
-	      const rad = lerp(0, Math.PI * 2, i);
-	      const curX = position.x + size.x + Math.sin(rad) * size.x;
-	      const curY = position.y + size.y + Math.cos(rad) * -size.y;
-	
-	      if (curX < 0 || curY < 0) {
-	        continue;
-	      }
-	
-	      const rX = round(curX, 4);
-	      const rY = round(curY, 4);
-	
-	      accum |= getDotsInCell(rX - 0.5, rY - 0.5);
-	
-	      const cellX = Math.max(Math.round(rX), 0);
-	      const cellY = Math.max(Math.round(rY), 0);
-	
-	      const index = Math.trunc(cellX + cellY * (cSizeX + 1 + cPositionX) + cellY);
-	
-	      //const index = Math.trunc(cellX + cellY * (size.x * 2 + 1) + cellY);
-	      const oldCode = this._result.charCodeAt(index) - 0x2800;
-	      const old = oldCode >= 0x00 && oldCode <= 0xff ? oldCode : 0;
-	      //console.log({ curX, curY, cellX, cellY, index, old, oldCode, accum });
-	      //console.log();
-	      accum |= old;
-	      this._result = replaceAt(this._result, index, String.fromCharCode(0x2800 + accum));
-	
-	      accum = 0;
-	    }
-	  }
-	
-	  public isInside(point: Vector2): boolean {
-	    const dx = Math.pow(point.x - this._position.x - this._width * 0.5, 2) / Math.pow(this.width * 0.5 - 0.1, 2);
-	    const dy = Math.pow(point.y - this._position.y - this._height * 0.5, 2) / Math.pow(this.height * 0.5 - 0.1, 2);
-	    return dx + dy <= 1;
-	  }
-	
-	  public stringValue(): string {
-	    return this._result;
-	  }
-	*/
-
     private string _result = "";
 
     public Ellipse(IReadOnlyVector2<float> position, IReadOnlyVector2<float> size, bool isFilled, Color color)
@@ -163,7 +56,6 @@ public class Ellipse : IFilledFigure
 
             var index = (int)MathF.Truncate(cellX + cellY * (cSizeX + 1 + cPositionX) + cellY);
 
-            //const index = Math.trunc(cellX + cellY * (size.x * 2 + 1) + cellY);
             var oldCode = _result[index] - 0x2800;
             var old = oldCode >= 0x00 && oldCode <= 0xff ? oldCode : 0;
             //Console.WriteLine(new { curX, curY, cellX, cellY, index, old, oldCode, accum });

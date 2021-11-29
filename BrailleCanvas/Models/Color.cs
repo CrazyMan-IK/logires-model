@@ -4,9 +4,8 @@ namespace BrailleCanvas.Models;
 
 public struct Color
 {
-    public float R { get; private set; } = 0;
-    public float G { get; private set; } = 0;
-    public float B { get; private set; } = 0;
+    private static Dictionary<int, Color> _cachedRYB = new Dictionary<int, Color>();
+    private static Dictionary<int, Color> _cachedRGB = new Dictionary<int, Color>();
 
     public Color() : this(0, 0, 0)
     {
@@ -19,6 +18,10 @@ public struct Color
         G = g;
         B = b;
     }
+
+    public float R { get; private set; } = 0;
+    public float G { get; private set; } = 0;
+    public float B { get; private set; } = 0;
 
     public string AsEscapeSequence()
     {
@@ -80,10 +83,14 @@ public struct Color
         return new Color(a.R / b, a.G / b, a.B / b);
     }
 
-    public static Color White => new Color(255, 255, 255);
-
     private Color AsRYB()
     {
+        var hashCode = GetHashCode();
+        if (_cachedRYB.TryGetValue(hashCode, out var value))
+        {
+            return value;
+        }
+
         var newColor = new Color(R, G, B);
 
         var w = MathF.Min(MathF.Min(newColor.R, newColor.G), newColor.B);
@@ -121,11 +128,18 @@ public struct Color
         newColor.G += w;
         newColor.B += w;
 
+        _cachedRYB[hashCode] = newColor;
         return newColor;
     }
 
     private Color AsRGB()
     {
+        var hashCode = GetHashCode();
+        if (_cachedRGB.TryGetValue(hashCode, out var value))
+        {
+            return value;
+        }
+
         var newColor = new Color(R, G, B);
 
         var w = MathF.Min(MathF.Min(newColor.R, newColor.G), newColor.B);
@@ -163,6 +177,12 @@ public struct Color
         newColor.G += w;
         newColor.B += w;
 
+        _cachedRGB[hashCode] = newColor;
         return newColor;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(R, G, B);
     }
 }

@@ -10,9 +10,9 @@ public class Canvas
     private readonly List<(int, IFigure)> _items = new List<(int, IFigure)>();
     private int _topZ = 0;
     private bool _canOverflow = false;
-    private (List<Color>, char)[,] _matrix = null;
-    //private List<Color>[,] _cmatrix = null;
-    private StringBuilder _result = null;
+    private (List<Color>, char)[,] _matrix;
+    //private List<Color>[,] _cmatrix;
+    private StringBuilder _result;
 
     public Canvas(IReadOnlyVector2<int> size, bool canOverflow = false)
     {
@@ -24,11 +24,11 @@ public class Canvas
 
         for (int i = 0; i < _matrix.GetLength(0); i++)
         {
-          for (int j = 0; j < _matrix.GetLength(1); j++)
-          {
-            _matrix[i, j] = (new List<Color>(), '\u2800');
-        		//_cmatrix[i, j] = new List<Color>();
-        	}
+            for (int j = 0; j < _matrix.GetLength(1); j++)
+            {
+                _matrix[i, j] = (new List<Color>(), '\u2800');
+                //_cmatrix[i, j] = new List<Color>();
+            }
         }
 
         _result = new StringBuilder((Size.X * Size.Y) * 2);
@@ -64,11 +64,11 @@ public class Canvas
         Sort();
         for (int i = 0; i < _matrix.GetLength(0); i++)
         {
-          for (int j = 0; j < _matrix.GetLength(1); j++)
-          {
-          	_matrix[i, j].Item1.Clear();
-          	_matrix[i, j].Item2 = '\u2800';
-        	}
+            for (int j = 0; j < _matrix.GetLength(1); j++)
+            {
+                _matrix[i, j].Item1.Clear();
+                _matrix[i, j].Item2 = '\u2800';
+            }
         }
 
         foreach (var (z, item) in _items)
@@ -92,7 +92,7 @@ public class Canvas
             {
                 if (_matrix[y, x].Item2 == '\u2800')
                 {
-                		_result.Append(_matrix[y, x].Item2);
+                    _result.Append(_matrix[y, x].Item2);
                     continue;
                 }
 
@@ -120,8 +120,8 @@ public class Canvas
         //return "";
         //return string.Join("\n", _matrix.GetRows().Select((row) => string.Join("", row)));
 
-				return _result.ToString();
-				
+        return _result.ToString();
+
         /*var res = matrix.GetRows().SelectMany((row) => Encoding.UTF8.GetBytes(row.SelectMany(c => c?.StringValue() ?? "").Append('\n').ToArray()));
 
         var span = new ReadOnlySpan<byte>(res.ToArray());
@@ -156,6 +156,13 @@ public class Canvas
             }
         }*/
 
+        var fitem = item as IFilledFigure;
+        var isFilled = false;
+        if (fitem != null)
+        {
+            isFilled = fitem.IsFilled;
+        }
+
         foreach (var chr in str)
         {
             if (!IsInBounds(x))
@@ -170,15 +177,15 @@ public class Canvas
             var result = '\0';
             if (chr >= 0x2800 && chr <= 0x28ff && oldChr >= 0x2800 && oldChr <= 0x28ff)
             {
-                if (oldChr != 0x2800 && item is IFilledFigure fitem && fitem.IsFilled)
+                if (oldChr != 0x2800 && fitem != null && isFilled)
                 {
                     var dots = Cell.GetDotsPositions(new Vector2Int(x, y));
-                    
+
                     result = Cell.Merge(chr - 0x2800, (chr | oldChr) - 0x2800, (a, b, index) =>
                     {
                         return fitem.IsInside(dots[7 - index]);
                     });
-                    
+
                     /*result.Merge((char)0xff, (a, b, index) =>
                     {
                         return fitem.IsInside(dots[7 - index]);

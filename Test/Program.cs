@@ -10,12 +10,12 @@ using BrailleCanvas.Models;
 
 Console.OutputEncoding = System.Text.Encoding.UTF8;
 Console.CursorVisible = false;
-AppDomain.CurrentDomain.ProcessExit += OnExit;
-Console.CancelKeyPress += OnExit;
+AppDomain.CurrentDomain.ProcessExit += (s, e) => OnExit();
+Console.CancelKeyPress += (s, e) => OnExit();
 
-static void OnExit(object sender, EventArgs e)
+static void OnExit()
 {
-	Console.CursorVisible = true;
+    Console.CursorVisible = true;
 }
 
 var rows = 20;
@@ -72,7 +72,7 @@ string CreateFrame()
     builder.Append(new string('-', xCount));
     builder.Append("+\n");
 
-		var empty = new string('\u2800', xCount);
+    var empty = new string('\u2800', xCount);
     for (int i = 0; i < yCount; i++)
     {
         builder.Append('|');
@@ -90,7 +90,7 @@ string CreateFrame()
 var ln1 = new Line(plist1, new Color(255, 0, 0));
 var ln2 = new Line(plist2, new Color(0, 0, 255));
 var el1 = new Ellipse(new Vector2(columns / 2 - 9, rows / 2 - 4.5f), new Vector2(18, 9), true, new Color(0, 255, 0));
-var frame = new Item(CreateFrame(), Vector2.Zero, false, Color.White);
+var frame = new Item(CreateFrame(), Vector2.Zero, false, Constants.White);
 
 c.Append(ln1);
 c.Append(ln2);
