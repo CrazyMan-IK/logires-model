@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BrailleCanvas\BrailleCanvas.csproj" />
+    <ProjectReference Include="..\Logires\Logires.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
