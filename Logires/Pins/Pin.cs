@@ -178,14 +178,14 @@ public abstract class Pin
 	}
 }
 
-public abstract class TypedPin<T> : Pin
+public abstract class TypedPin<T> : Pin where T : new ()
 {
-	public TypedPin(bool isInput) : base(isInput)
-	{
+    public TypedPin(bool isInput) : base(isInput)
+    {
 		
 	}
 
-	public T Value { get; set; } = default;
+	public T Value { get; set; } = new T();
 
 	public override void RetrieveValue(Pin other)
 	{

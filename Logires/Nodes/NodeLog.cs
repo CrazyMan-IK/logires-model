@@ -6,7 +6,7 @@ namespace Logires.Nodes;
 
 public class NodeLog : Node, IHaveInputs
 {
-	public event Action<bool> Logged;
+	public event Action<bool>? Logged = null;
 
 	private BooleanPin _input = new BooleanPin(true);
 	

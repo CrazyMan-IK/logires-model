@@ -1,6 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="OneOf" Version="3.0.203" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\BrailleCanvas\BrailleCanvas.csproj" />
     <ProjectReference Include="..\Logires\Logires.csproj" />
   </ItemGroup>

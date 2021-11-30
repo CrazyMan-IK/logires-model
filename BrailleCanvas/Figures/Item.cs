@@ -1,3 +1,4 @@
+using OneOf;
 using BrailleCanvas.Interfaces;
 using BrailleCanvas.Models;
 
@@ -7,7 +8,7 @@ public class Item : IFilledFigure
 {
     private int _oldHash = 0;
 
-    public Item(string text, IReadOnlyVector2<float> position, bool isFilled, Color color)
+    public Item(string text, IReadOnlyVector2<float> position, bool isFilled, OneOf<Color, Ternary<Color>> color)
     {
         Text = text;
         Size = Vector2.Zero;
@@ -20,7 +21,7 @@ public class Item : IFilledFigure
     public IReadOnlyVector2<float> Size { get; private set; }
     public IReadOnlyVector2<float> Position { get; private set; }
     public int? ZIndex { get; private set; }
-    public Color Color { get; private set; }
+    public OneOf<Color, Ternary<Color>> Color { get; private set; }
     public bool IsFilled { get; private set; }
 
     public string StringValue()

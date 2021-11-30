@@ -1,4 +1,5 @@
 using System.Text;
+using OneOf;
 using BrailleCanvas.Models;
 using BrailleCanvas.Extensions;
 using BrailleCanvas.Interfaces;
@@ -10,7 +11,7 @@ public class Canvas
     private readonly List<(int, IFigure)> _items = new List<(int, IFigure)>();
     private int _topZ = 0;
     private bool _canOverflow = false;
-    private (List<Color>, char)[,] _matrix;
+    private (List<OneOf<Color, Ternary<Color>>>, char)[,] _matrix;
     //private List<Color>[,] _cmatrix;
     private StringBuilder _result;
 
@@ -19,14 +20,14 @@ public class Canvas
         Size = size;
         _canOverflow = canOverflow;
 
-        _matrix = new (List<Color>, char)[Size.Y, Size.X];
+        _matrix = new (List<OneOf<Color, Ternary<Color>>>, char)[Size.Y, Size.X];
         //_cmatrix = new List<Color>[Size.Y, Size.X];
 
         for (int i = 0; i < _matrix.GetLength(0); i++)
         {
             for (int j = 0; j < _matrix.GetLength(1); j++)
             {
-                _matrix[i, j] = (new List<Color>(), '\u2800');
+                _matrix[i, j] = (new List<OneOf<Color, Ternary<Color>>>(), '\u2800');
                 //_cmatrix[i, j] = new List<Color>();
             }
         }
@@ -96,7 +97,8 @@ public class Canvas
                     continue;
                 }
 
-                var color = Color.MixColors(_matrix[y, x].Item1);
+                
+                var color = Color.MixColors(_matrix[y, x].Item1.Select(x => x.Match(x => x, x => x.Value)));
                 //var color = colors[0];
 
                 //if (colors.Count > 0)
@@ -138,7 +140,7 @@ public class Canvas
         return x < Size.X || _canOverflow;
     }
 
-    private void Draw(IFigure item, (List<Color>, char)[,] matrix, string str, int x, int y)
+    private void Draw(IFigure item, (List<OneOf<Color, Ternary<Color>>>, char)[,] matrix, string str, int x, int y)
     {
         if (y < 0 || (y > Size.Y - 1 && !_canOverflow))
         {
