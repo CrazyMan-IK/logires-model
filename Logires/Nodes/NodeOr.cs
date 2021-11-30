@@ -4,21 +4,23 @@ using Logires.Interfaces;
 
 namespace Logires.Nodes;
 
-public class NodeNegate : Node, IHaveInputs, IHaveOutputs
+public class NodeOr : Node, IHaveInputs, IHaveOutputs
 {
-	private BooleanPin _input = new BooleanPin(true);
+	private BooleanPin _inputA = new BooleanPin(true);
+	private BooleanPin _inputB = new BooleanPin(true);
 	private BooleanPin _output = new BooleanPin(false);
 	
-	public NodeNegate()
+	public NodeOr()
 	{
-	  _output.Value = true;
+	  
 	}
 	
 	public IEnumerable<Pin> Inputs
 	{
 	  get
 	  {
-	    yield return _input;
+	    yield return _inputA;
+	    yield return _inputB;
 	  }
 	}
 	public IEnumerable<Pin> Outputs
@@ -31,6 +33,6 @@ public class NodeNegate : Node, IHaveInputs, IHaveOutputs
 	
 	public override void Update(long ticks)
 	{
-	  _output.Value = !_input.Value;
+	  _output.Value = _inputA.Value || _inputB.Value;
 	}
 }

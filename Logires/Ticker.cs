@@ -16,6 +16,8 @@ public class Ticker
 		_timer.AutoReset = true;
 	}
 
+	public long Ticks => _ticks;
+
 	public void Start()
 	{
 		_timer.Start();
@@ -48,7 +50,7 @@ public class Ticker
 			listener.Tick(_ticks);
 		}
 
-		Console.WriteLine();
+		//Console.WriteLine("|---------------------------------------------|");
 		_ticks++;
 	}
 }

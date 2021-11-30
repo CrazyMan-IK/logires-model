@@ -168,12 +168,13 @@ public abstract class Pin
 	  }
 	
 	  _needUpdate = false;
+	  Update(ticks);
 	  //UpdateRequested?.Invoke(ticks);
-	  if (_needUpdate)
+	  /*if (_needUpdate)
 	  {
 	    _needUpdate = false;
 	    Update(ticks);
-	  }
+	  }*/
 	}
 }
 

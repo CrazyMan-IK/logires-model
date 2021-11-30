@@ -73,7 +73,7 @@ public abstract class Node : ITickable
 
 	public void Tick(long ticks)
 	{
-		Console.WriteLine(GetType().Name);
+		//Console.WriteLine(GetType().Name);
 	
 		if (this is IHaveInputs haveInputs)
 		{
@@ -82,8 +82,8 @@ public abstract class Node : ITickable
 		    input.Update(ticks);
 		  }
 
-		  Console.WriteLine("Have Inputs");
-		  Console.WriteLine(string.Join(", ", haveInputs.Inputs));
+		  //Console.WriteLine("Have Inputs");
+		  //Console.WriteLine(string.Join(", ", haveInputs.Inputs));
 		}
 		
 		if (this._needUpdate)
@@ -99,9 +99,11 @@ public abstract class Node : ITickable
 		    output.Update(ticks);
 		  }
 
-		  Console.WriteLine("Have Outputs");
-		  Console.WriteLine(string.Join(", ", haveOutputs.Outputs));
+		  //Console.WriteLine("Have Outputs");
+		  //Console.WriteLine(string.Join(", ", haveOutputs.Outputs));
 		}
+
+		//Console.WriteLine();
 	}
 
 	public abstract void Update(long ticks);
