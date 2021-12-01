@@ -122,11 +122,16 @@ public abstract class Pin
 	  }
 	
 	  _linkedPins.Add(pin);
-	  pin._linkedPins.Add(this);
+	  pin.Connect(this);
 	}
 
 	public void Disconnect(Pin pin)
 	{
+		if (!IsConnectedWith(pin))
+		{
+			return;
+		}
+	
 	  _linkedPins.Remove(pin);
 	  pin.Disconnect(this);
 	}
