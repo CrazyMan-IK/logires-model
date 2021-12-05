@@ -62,6 +62,11 @@ public struct Color
     {
         return new Color(a.R + b.R, a.G + b.G, a.B + b.B);
     }
+    
+    public static Color operator -(Color a, Color b)
+    {
+        return new Color(a.R - b.R, a.G - b.G, a.B - b.B);
+    }
 
     public static Color operator +(Color a, float b)
     {

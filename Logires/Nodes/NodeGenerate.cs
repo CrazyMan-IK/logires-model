@@ -14,7 +14,7 @@ public class NodeGenerate : Node, IHaveOutputs
 	  _frequency = freq;
 	}
 	
-	public IEnumerable<Pin> Outputs
+	public IEnumerable<IPin> Outputs
 	{
 		get
 		{

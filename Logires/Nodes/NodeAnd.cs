@@ -15,7 +15,7 @@ public class NodeAnd : Node, IHaveInputs, IHaveOutputs
 	  
 	}
 	
-	public IEnumerable<Pin> Inputs
+	public IEnumerable<IPin> Inputs
 	{
 	  get
 	  {
@@ -23,7 +23,7 @@ public class NodeAnd : Node, IHaveInputs, IHaveOutputs
 	    yield return _inputB;
 	  }
 	}
-	public IEnumerable<Pin> Outputs
+	public IEnumerable<IPin> Outputs
 	{
 	  get
 	  {

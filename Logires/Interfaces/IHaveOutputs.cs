@@ -4,5 +4,5 @@ namespace Logires.Interfaces;
 
 public interface IHaveOutputs
 {
-	IEnumerable<Pin> Outputs { get; }
+	IEnumerable<IPin> Outputs { get; }
 }

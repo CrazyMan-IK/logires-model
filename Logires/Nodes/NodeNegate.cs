@@ -14,14 +14,14 @@ public class NodeNegate : Node, IHaveInputs, IHaveOutputs
 	  _output.Value = true;
 	}
 	
-	public IEnumerable<Pin> Inputs
+	public IEnumerable<IPin> Inputs
 	{
 	  get
 	  {
 	    yield return _input;
 	  }
 	}
-	public IEnumerable<Pin> Outputs
+	public IEnumerable<IPin> Outputs
 	{
 	  get
 	  {

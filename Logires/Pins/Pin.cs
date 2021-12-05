@@ -82,11 +82,13 @@ export abstract class TypedPin<T> extends Pin {
 }
 */
 
+using Logires.Interfaces;
+
 namespace Logires.Pins;
 
-public abstract class Pin
+public abstract class Pin<T> : IPin, IPin<T>
 {
-	private readonly List<Pin> _linkedPins = new List<Pin>();
+	private readonly List<IPin> _linkedPins = new List<IPin>();
 	private readonly bool _isInput = true;
 	private bool _needUpdate = false;
 
@@ -95,15 +97,10 @@ public abstract class Pin
 		_isInput = isInput;
 	}
 
-	//public abstract object Value { get; set; }
-	public IReadOnlyList<Pin> LinkedPins => _linkedPins;
+	public T? Value { get; set; } = default;
+	public IReadOnlyList<IPin> LinkedPins => _linkedPins;
 
-	//public abstract void SetValue(object value);
-	//public abstract object GetValue();
-
-	public abstract void RetrieveValue(Pin other);
-
-	public void Connect(Pin pin)
+	public void Connect(IPin pin)
 	{
 	  if (IsConnectedWith(pin))
 	  {
@@ -112,6 +109,7 @@ public abstract class Pin
 	
 	  if (!_isInput)
 	  {
+	  	_linkedPins.Add(pin);
 	    pin.Connect(this);
 	    return;
 	  }
@@ -125,7 +123,7 @@ public abstract class Pin
 	  pin.Connect(this);
 	}
 
-	public void Disconnect(Pin pin)
+	public void Disconnect(IPin pin)
 	{
 		if (!IsConnectedWith(pin))
 		{
@@ -136,9 +134,19 @@ public abstract class Pin
 	  pin.Disconnect(this);
 	}
 	
-	public bool IsConnectedWith(Pin pin)
+	public bool IsConnectedWith(IPin pin)
 	{
 	  return _linkedPins.Contains(pin);
+	}
+
+	public T2 RetrieveValue<T2>(IPin other)
+	{
+		if (Value == null)
+		{
+			throw new InvalidOperationException();
+		}
+	
+		return PinsConverter.GetConvertator<T, T2>().Invoke(Value);
 	}
 
 	public void Update(long ticks)
@@ -156,8 +164,14 @@ public abstract class Pin
 	
 	  var otherPin = _linkedPins[0];
 	  otherPin.RequestUpdate(ticks);
-	
-	  RetrieveValue(otherPin);
+
+	  if (otherPin is Pin<T> other)
+	  {
+	  	Value = other.Value;
+	  	return;
+	  }
+
+	  Value = otherPin.RetrieveValue<T>(this);
 	}
 	
 	public void MarkDirty()
@@ -165,7 +179,7 @@ public abstract class Pin
 	  _needUpdate = true;
 	}
 	
-	private void RequestUpdate(long ticks)
+	public void RequestUpdate(long ticks)
 	{
 	  if (!_needUpdate)
 	  {
@@ -174,32 +188,8 @@ public abstract class Pin
 	
 	  _needUpdate = false;
 	  Update(ticks);
-	  //UpdateRequested?.Invoke(ticks);
-	  /*if (_needUpdate)
-	  {
-	    _needUpdate = false;
-	    Update(ticks);
-	  }*/
 	}
-}
-
-public abstract class TypedPin<T> : Pin where T : new ()
-{
-    public TypedPin(bool isInput) : base(isInput)
-    {
-		
-	}
-
-	public T Value { get; set; } = new T();
-
-	public override void RetrieveValue(Pin other)
-	{
-		if (other is TypedPin<T> pin)
-		{
-			Value = pin.Value;
-		}
-	}
-
+	
 	public override string ToString()
 	{
 		return $"{GetType().Name}: {Value}";

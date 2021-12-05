@@ -15,7 +15,7 @@ public class NodeLog : Node, IHaveInputs
 	  
 	}
 	
-	public IEnumerable<Pin> Inputs
+	public IEnumerable<IPin> Inputs
 	{
 	  get
 	  {

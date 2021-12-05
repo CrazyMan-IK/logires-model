@@ -1,6 +1,6 @@
 namespace Logires.Pins;
 
-public class BooleanPin : TypedPin<bool>
+public class BooleanPin : Pin<bool>
 {
   public BooleanPin(bool isInput) : base(isInput)
   {

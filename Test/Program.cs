@@ -209,3 +209,11 @@ while(true)
 	Console.WriteLine(canvas.StringValue());
 	Console.SetCursorPosition(0, 0);
 }
+
+/*
+var c1 = PinsConverter.GetConvertator<BooleanPin, BitPin, bool, List<bool>>();
+var c2 = PinsConverter.GetConvertator<BitPin, BooleanPin, List<bool>, bool>();
+
+Console.WriteLine(string.Join("; ", c1?.Invoke(true)));
+Console.WriteLine(c2?.Invoke(new List<bool>() { false, false, true, false }));
+*/

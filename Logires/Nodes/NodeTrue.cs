@@ -13,7 +13,7 @@ public class NodeTrue : Node, IHaveOutputs
 	  _output.Value = true;
 	}
 	
-	public IEnumerable<Pin> Outputs
+	public IEnumerable<IPin> Outputs
 	{
 		get
 		{
