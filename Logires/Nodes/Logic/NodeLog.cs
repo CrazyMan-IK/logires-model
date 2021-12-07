@@ -8,7 +8,7 @@ public class NodeLog : Node, IHaveInputs
 {
 	public event Action<bool>? Logged = null;
 
-	private BooleanPin _input = new BooleanPin(true);
+	private readonly BooleanPin _input = new BooleanPin(true);
 	
 	public NodeLog()
 	{

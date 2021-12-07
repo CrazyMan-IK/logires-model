@@ -6,9 +6,9 @@ namespace Logires.Nodes;
 
 public class NodeXor : Node, IHaveInputs, IHaveOutputs
 {
-	private BooleanPin _inputA = new BooleanPin(true);
-	private BooleanPin _inputB = new BooleanPin(true);
-	private BooleanPin _output = new BooleanPin(false);
+	private readonly BooleanPin _inputA = new BooleanPin(true);
+	private readonly BooleanPin _inputB = new BooleanPin(true);
+	private readonly BooleanPin _output = new BooleanPin(false);
 	
 	public NodeXor()
 	{

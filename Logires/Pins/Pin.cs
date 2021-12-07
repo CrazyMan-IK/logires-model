@@ -88,110 +88,133 @@ namespace Logires.Pins;
 
 public abstract class Pin<T> : IPin, IPin<T>
 {
-	private readonly List<IPin> _linkedPins = new List<IPin>();
-	private readonly bool _isInput = true;
-	private bool _needUpdate = false;
+    private readonly List<IPin> _linkedPins = new List<IPin>();
+    private readonly bool _isInput = true;
+    private bool _needUpdate = false;
 
-	public Pin(bool isInput)
-	{
-		_isInput = isInput;
-	}
+    public Pin(bool isInput)
+    {
+        _isInput = isInput;
+        Value = GetDefaultValue();
+    }
 
-	public T? Value { get; set; } = default;
-	public IReadOnlyList<IPin> LinkedPins => _linkedPins;
+    public T Value { get; set; }
+    public IReadOnlyList<IPin> LinkedPins => _linkedPins;
+    public bool IsInput => _isInput;
 
-	public void Connect(IPin pin)
-	{
-	  if (IsConnectedWith(pin))
-	  {
-	    return;
-	  }
-	
-	  if (!_isInput)
-	  {
-	  	_linkedPins.Add(pin);
-	    pin.Connect(this);
-	    return;
-	  }
-	
-	  if (_linkedPins.Count > 0)
-	  {
-	    Disconnect(_linkedPins[0]);
-	  }
-	
-	  _linkedPins.Add(pin);
-	  pin.Connect(this);
-	}
+    public void Connect(IPin other)
+    {
+        if (!CanConnectTo<T>(other))
+        {
+            throw new InvalidOperationException();
+        }
 
-	public void Disconnect(IPin pin)
-	{
-		if (!IsConnectedWith(pin))
-		{
-			return;
-		}
-	
-	  _linkedPins.Remove(pin);
-	  pin.Disconnect(this);
-	}
-	
-	public bool IsConnectedWith(IPin pin)
-	{
-	  return _linkedPins.Contains(pin);
-	}
+        if (IsConnectedWith(other))
+        {
+            return;
+        }
 
-	public T2 RetrieveValue<T2>(IPin other)
-	{
-		if (Value == null)
-		{
-			throw new InvalidOperationException();
-		}
-	
-		return PinsConverter.GetConvertator<T, T2>().Invoke(Value);
-	}
+        if (!_isInput)
+        {
+            _linkedPins.Add(other);
+            other.Connect(this);
+            return;
+        }
 
-	public void Update(long ticks)
-	{
-	  if (!_isInput)
-	  {
-	    _needUpdate = false;
-	    return;
-	  }
-	
-	  if (_linkedPins.Count < 1)
-	  {
-	    return;
-	  }
-	
-	  var otherPin = _linkedPins[0];
-	  otherPin.RequestUpdate(ticks);
+        if (_linkedPins.Count > 0)
+        {
+            Disconnect(_linkedPins[0]);
+        }
 
-	  if (otherPin is Pin<T> other)
-	  {
-	  	Value = other.Value;
-	  	return;
-	  }
+        _linkedPins.Add(other);
+        other.Connect(this);
+    }
 
-	  Value = otherPin.RetrieveValue<T>(this);
-	}
-	
-	public void MarkDirty()
-	{
-	  _needUpdate = true;
-	}
-	
-	public void RequestUpdate(long ticks)
-	{
-	  if (!_needUpdate)
-	  {
-	    return;
-	  }
-	
-	  _needUpdate = false;
-	  Update(ticks);
-	}
-	
-	public override string ToString()
-	{
-		return $"{GetType().Name}: {Value}";
-	}
+    public void Disconnect(IPin other)
+    {
+        if (!IsConnectedWith(other))
+        {
+            return;
+        }
+
+        _linkedPins.Remove(other);
+        other.Disconnect(this);
+    }
+
+    public bool IsConnectedWith(IPin other)
+    {
+        return _linkedPins.Contains(other);
+    }
+
+    public bool CanConnectTo<T2>(IPin other)
+    {
+        var isDifferentSide = _isInput ^ other.IsInput;
+        var isSameType = typeof(T) == typeof(T2);
+
+        return isDifferentSide && (PinsConverter.HasConvertator<T, T2>() || isSameType);
+    }
+
+    public T2 RetrieveValue<T2>()
+    {
+        if (Value == null)
+        {
+            throw new InvalidOperationException();
+        }
+
+        var convertator = PinsConverter.GetConvertator<T, T2>();
+        if (convertator == null)
+        {
+            throw new InvalidOperationException();
+        }
+
+        return convertator.Invoke(Value);
+    }
+
+    public void Update(long ticks)
+    {
+        if (!_isInput)
+        {
+            _needUpdate = false;
+            return;
+        }
+
+        if (_linkedPins.Count < 1)
+        {
+            return;
+        }
+
+        var otherPin = _linkedPins[0];
+        otherPin.RequestUpdate(ticks);
+
+        if (otherPin is Pin<T> other)
+        {
+            Value = other.Value;
+            return;
+        }
+
+        Value = otherPin.RetrieveValue<T>();
+    }
+
+    public void MarkDirty()
+    {
+        _needUpdate = true;
+    }
+
+    public void RequestUpdate(long ticks)
+    {
+        if (!_needUpdate)
+        {
+            return;
+        }
+
+        _needUpdate = false;
+        Update(ticks);
+    }
+
+    public override string ToString()
+    {
+        return $"{GetType().Name}: {Value}";
+    }
+
+    public abstract T GetDefaultValue();
 }

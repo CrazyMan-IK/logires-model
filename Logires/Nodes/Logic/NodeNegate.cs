@@ -6,8 +6,8 @@ namespace Logires.Nodes;
 
 public class NodeNegate : Node, IHaveInputs, IHaveOutputs
 {
-	private BooleanPin _input = new BooleanPin(true);
-	private BooleanPin _output = new BooleanPin(false);
+	private readonly BooleanPin _input = new BooleanPin(true);
+	private readonly BooleanPin _output = new BooleanPin(false);
 	
 	public NodeNegate()
 	{

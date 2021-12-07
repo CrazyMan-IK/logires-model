@@ -86,7 +86,7 @@ public abstract class Node : ITickable
 		  //Console.WriteLine(string.Join(", ", haveInputs.Inputs));
 		}
 		
-		if (this._needUpdate)
+		if (_needUpdate)
 		{
 		  _needUpdate = false;
 		  Update(ticks);

@@ -6,8 +6,8 @@ namespace Logires.Nodes;
 
 public class NodeGenerate : Node, IHaveOutputs
 {
-	private BooleanPin _output = new BooleanPin(false);
-	private int _frequency = 1;
+	private readonly BooleanPin _output = new BooleanPin(false);
+	private readonly int _frequency = 1;
 	
 	public NodeGenerate(int freq = 1)
 	{

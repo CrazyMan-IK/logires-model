@@ -1,18 +1,17 @@
-using System.Text;
-using OneOf;
-using Logires;
-using Logires.Pins;
-using Logires.Nodes;
-using Logires.Interfaces;
 using BrailleCanvas;
-using BrailleCanvas.Models;
 using BrailleCanvas.Figures;
+using BrailleCanvas.Models;
+using Logires;
+using Logires.Interfaces;
+using Logires.Nodes;
+using Logires.Pins;
+using System.Text;
 using Test;
 
 const int rows = 25;
 const int columns = 76;
 
-string CreateFrame()
+static string CreateFrame()
 {
     var builder = new StringBuilder(columns * rows);
 
@@ -54,11 +53,22 @@ var frame = new Item(CreateFrame(), Vector2.Zero, false, Constants.White);
 
 var ticker = new Ticker(4);
 
-var n1 = new NodeTrue();
+/*var n1 = new NodeTrue();
 var ng = new NodeGenerate(4);
 var na = new NodeAnd();
 var nn = new NodeNegate();
 var no = new NodeOr();
+
+var rg = new RangeGetter();
+var imn = new IteratorMoveNext();*/
+
+var ng1 = new NodeGenerate(1);
+var ng2 = new NodeGenerate(2);
+var ng3 = new NodeGenerate(4);
+
+var bm1 = new BitMerger();
+var bm2 = new BitMerger();
+
 var nl = new NodeLog();
 
 /*nl.Logged += (value) => {
@@ -89,7 +99,42 @@ ticker.AddListener(nn);
 ticker.AddListener(no);
 ticker.AddListener(nl);*/
 
-var firstNode = new NodeGenerate();
+/*nodes.Add(new NodeView(rg, new Vector2(4, 6), Constants.Purple));
+nodes.Add(new NodeView(imn, new Vector2(16, 6), Constants.Purple));
+
+var ii1 = new IntegerPin(false);
+var ii2 = new IntegerPin(false);
+
+ii2.Value = 10;
+
+ii1.Connect(rg.Inputs.ElementAt(0));
+ii2.Connect(rg.Inputs.ElementAt(1));
+rg.Outputs.ElementAt(0).Connect(imn.Inputs.ElementAt(0));
+
+ticker.AddListener(rg);
+ticker.AddListener(imn);*/
+
+nodes.Add(new NodeView(ng1, new Vector2(4, 2), Constants.Purple));
+nodes.Add(new NodeView(ng2, new Vector2(4, 6), Constants.Purple));
+nodes.Add(new NodeView(ng3, new Vector2(4, 10), Constants.Purple));
+nodes.Add(new NodeView(bm1, new Vector2(16, 2), Constants.Purple));
+nodes.Add(new NodeView(bm2, new Vector2(28, 10), Constants.Purple));
+nodes.Add(new NodeView(nl, new Vector2(40, 10), Constants.Purple));
+
+ng1.Outputs.ElementAt(0).Connect(bm1.Inputs.ElementAt(0));
+ng2.Outputs.ElementAt(0).Connect(bm1.Inputs.ElementAt(1));
+bm1.Outputs.ElementAt(0).Connect(bm2.Inputs.ElementAt(0));
+ng3.Outputs.ElementAt(0).Connect(bm2.Inputs.ElementAt(1));
+bm2.Outputs.ElementAt(0).Connect(nl.Inputs.ElementAt(0));
+
+ticker.AddListener(ng1);
+ticker.AddListener(ng2);
+ticker.AddListener(ng3);
+ticker.AddListener(bm1);
+ticker.AddListener(bm2);
+ticker.AddListener(nl);
+
+/*var firstNode = new NodeGenerate();
 OneOf<NodeNegate, NodeGenerate> lastNode = firstNode;
 
 nodes.Add(new NodeView(firstNode, new Vector2(5, 3), Constants.White));
@@ -154,7 +199,7 @@ nodes.Add(new NodeView(nl2, new Vector2(65, 18), Constants.White));
 ticker.AddListener(na1);
 ticker.AddListener(na2);
 ticker.AddListener(nl1);
-ticker.AddListener(nl2);
+ticker.AddListener(nl2);*/
 
 ticker.Start();
 
@@ -167,18 +212,18 @@ foreach (var node in nodes)
 
     foreach (var output in haveOutputs.Outputs)
     {
-        if (output is not BooleanPin booleanOutput)
+        /*if (output is not BooleanPin booleanOutput)
         {
             continue;
-        }
+        }*/
 
         foreach (var node2 in nodes)
         {
-						if (node == node2)
-						{
-							continue;
-						}
-        	
+            if (node == node2)
+            {
+                continue;
+            }
+
             if (node2.Node is not IHaveInputs haveInputs)
             {
                 continue;
@@ -191,7 +236,29 @@ foreach (var node in nodes)
                     continue;
                 }
 
-                canvas.Append(new Line(new[] { node.Position, node2.Position }, new Ternary<Color>(() => booleanOutput.Value, Constants.Green, Constants.Red)));
+                if (output is BooleanPin booleanOutput)
+                {
+                    canvas.Append(new Line(new[] { node.Position, node2.Position }, new Ternary<Color>(() => booleanOutput.Value, Constants.Green, Constants.Red)));
+                }
+                else if (output is BitPin bitOutput)
+                {
+                    canvas.Append(new Line(new[] { node.Position, node2.Position }, new Gradient(() =>
+                    {
+                        var totalCount = bitOutput.Value.Count;
+                        if (totalCount == 0)
+                        {
+                            return 0;
+                        }
+
+                        var activeCount = bitOutput.Value.Count(x => x);
+
+                        return activeCount * 1.0f / totalCount;
+                    }, Constants.Red, Constants.Blue, Constants.Green)));
+                }
+                else
+                {
+                    canvas.Append(new Line(new[] { node.Position, node2.Position }, Constants.Yellow));
+                }
             }
         }
     }
@@ -199,15 +266,15 @@ foreach (var node in nodes)
 
 foreach (var node in nodes)
 {
-	canvas.Append(node.Figure);
+    canvas.Append(node.Figure);
 }
 
 canvas.Append(frame);
 
-while(true)
+while (true)
 {
-	Console.WriteLine(canvas.StringValue());
-	Console.SetCursorPosition(0, 0);
+    Console.WriteLine(canvas.StringValue());
+    Console.SetCursorPosition(0, 0);
 }
 
 /*

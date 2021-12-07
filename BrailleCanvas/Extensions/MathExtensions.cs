@@ -39,4 +39,9 @@ public static class MathExtensions
 
     	return max;
     }
+
+    public static float Clamp(float value, float min, float max)
+    {
+        return MathF.Min(MathF.Max(value, min), max);
+    }
 }

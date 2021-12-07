@@ -7,7 +7,7 @@ namespace Logires;
 
 public static class PinsConverter
 {
-	private static Dictionary<int, object> _convertions = new Dictionary<int, object>();
+	private static readonly Dictionary<int, object> _convertions = new Dictionary<int, object>();
 
 	static PinsConverter()
 	{
@@ -28,19 +28,18 @@ public static class PinsConverter
 		AddConvertator<double, int>(DoubleToInt32);
 	}
 
+	public static bool HasConvertator<T1, T2>()
+	{
+		var hc = GetHashCode<T1, T2>();
+
+		return _convertions.ContainsKey(hc);
+	}
+
 	public static Func<T1, T2>? GetConvertator<T1, T2>()
 	{
-		return GetConvertator(typeof(T1), typeof(T2)) as Func<T1, T2>;
-	}
-	
-	public static object GetConvertator(Type t1, Type t2)
-	{
-		var hc = GetHashCode(t1, t2);
+		var hc = GetHashCode<T1, T2>();
 
-		/*Console.WriteLine("Get");
-		Console.WriteLine(hc);*/
-
-		return _convertions[hc];
+		return _convertions[hc] as Func<T1, T2>;
 	}
 
 	public static List<bool> BooleanToBit(bool value)
@@ -117,20 +116,11 @@ public static class PinsConverter
 	{
 		var hc = GetHashCode<T1, T2>();
 
-		/*Console.WriteLine("Add");
-		Console.WriteLine(hc);*/
-		
-		//_convertions[hc] = Expression.Lambda<Func<object, object>>(convertator.Body, convertator.Parameters[0]);
 		_convertions[hc] = convertator;
 	}
 
 	private static int GetHashCode<T1, T2>()
 	{
-		return GetHashCode(typeof(T1), typeof(T2));
-	}
-	
-	private static int GetHashCode(Type t1, Type t2)
-	{
-		return HashCode.Combine(t1, t2);
+		return HashCode.Combine(typeof(T1), typeof(T2));
 	}
 }

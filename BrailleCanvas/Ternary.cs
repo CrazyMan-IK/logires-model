@@ -1,6 +1,8 @@
-﻿namespace BrailleCanvas;
+﻿using BrailleCanvas.Interfaces;
 
-public class Ternary<T>
+namespace BrailleCanvas;
+
+public class Ternary<T> : IHasValue<T>
 {
     private readonly Func<bool> _getter;
     private readonly T _left;

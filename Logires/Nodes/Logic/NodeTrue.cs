@@ -4,13 +4,13 @@ using Logires.Interfaces;
 
 namespace Logires.Nodes;
 
-public class NodeFalse : Node, IHaveOutputs
+public class NodeTrue : Node, IHaveOutputs
 {
-	private BooleanPin _output = new BooleanPin(false);
+	private readonly BooleanPin _output = new BooleanPin(false);
 	
-	public NodeFalse()
+	public NodeTrue()
 	{
-	  
+	  _output.Value = true;
 	}
 	
 	public IEnumerable<IPin> Outputs

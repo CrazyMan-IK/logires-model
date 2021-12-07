@@ -10,7 +10,7 @@ public class Line : IFigure
     private char[] _result = Array.Empty<char>();
     private int _oldPointsHash = 0;
 
-    public Line(IEnumerable<IReadOnlyVector2<float>> points, OneOf<Color, Ternary<Color>> color)
+    public Line(IEnumerable<IReadOnlyVector2<float>> points, OneOf<Color, IHasValue<Color>> color)
     {
         Points = points;
         Color = color;
@@ -23,7 +23,7 @@ public class Line : IFigure
     public IReadOnlyVector2<float> Size { get; private set; }
     public IReadOnlyVector2<float> Position { get; private set; }
     public int? ZIndex { get; private set; }
-    public OneOf<Color, Ternary<Color>> Color { get; private set; }
+    public OneOf<Color, IHasValue<Color>> Color { get; private set; }
 
     public string StringValue()
     {

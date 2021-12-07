@@ -33,31 +33,6 @@ public struct Color
         return $"R: {R}, G: {G}, B: {B}";
     }
 
-    public static Color MixColors(IEnumerable<Color> colors)
-    {
-        var acc = new Color();
-
-        //Console.WriteLine("|------------|");
-
-        int count = 0;
-        foreach (var color in colors)
-        {
-            //Console.WriteLine(color);
-            //Console.WriteLine(color.AsRYB());
-            acc += color.AsRYB();
-            count++;
-        }
-
-        //Console.WriteLine();
-        //Console.WriteLine(acc);
-
-        acc /= count;
-
-        var result = acc.AsRGB();
-
-        return result;
-    }
-
     public static Color operator +(Color a, Color b)
     {
         return new Color(a.R + b.R, a.G + b.G, a.B + b.B);
@@ -88,7 +63,7 @@ public struct Color
         return new Color(a.R / b, a.G / b, a.B / b);
     }
 
-    private Color AsRYB()
+    public Color AsRYB()
     {
         var hashCode = GetHashCode();
         if (_cachedRYB.TryGetValue(hashCode, out var value))
@@ -137,7 +112,7 @@ public struct Color
         return newColor;
     }
 
-    private Color AsRGB()
+    public Color AsRGB()
     {
         var hashCode = GetHashCode();
         if (_cachedRGB.TryGetValue(hashCode, out var value))

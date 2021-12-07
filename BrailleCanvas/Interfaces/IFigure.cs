@@ -8,7 +8,7 @@ public interface IFigure
     IReadOnlyVector2<float> Size { get; }
     IReadOnlyVector2<float> Position { get; }
     int? ZIndex { get; }
-    OneOf<Color, Ternary<Color>> Color { get; }
+    OneOf<Color, IHasValue<Color>> Color { get; }
 
     string StringValue();
 }
