@@ -11,4 +11,9 @@ public class BitPin : Pin<List<bool>>
     {
         return new List<bool>();
     }
+
+    public override Pin<List<bool>> Clone(bool isInput)
+    {
+        return new BitPin(isInput);
+    }
 }

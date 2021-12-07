@@ -69,7 +69,8 @@ var ng3 = new NodeGenerate(4);
 var bm1 = new BitMerger();
 var bm2 = new BitMerger();
 
-var nl = new NodeLog();
+var nl1 = new NodeLog();
+var nl2 = new NodeLog();
 
 var sch2 = new Scheme(new List<Node>() {
 	ng1,
@@ -79,7 +80,7 @@ var sch2 = new Scheme(new List<Node>() {
 	bm1,
 	bm2,
 
-	nl
+	nl1
 });
 
 /*nl.Logged += (value) => {
@@ -125,18 +126,23 @@ rg.Outputs.ElementAt(0).Connect(imn.Inputs.ElementAt(0));
 ticker.AddListener(rg);
 ticker.AddListener(imn);*/
 
-nodes.Add(new NodeView(ng1, new Vector2(4, 2), Constants.Purple));
+/*nodes.Add(new NodeView(ng1, new Vector2(4, 2), Constants.Purple));
 nodes.Add(new NodeView(ng2, new Vector2(4, 6), Constants.Purple));
 nodes.Add(new NodeView(ng3, new Vector2(4, 10), Constants.Purple));
 nodes.Add(new NodeView(bm1, new Vector2(16, 2), Constants.Purple));
 nodes.Add(new NodeView(bm2, new Vector2(28, 10), Constants.Purple));
-nodes.Add(new NodeView(nl, new Vector2(40, 10), Constants.Purple));
+nodes.Add(new NodeView(nl1, new Vector2(40, 10), Constants.Purple));*/
+nodes.Add(new NodeView(sch2, new Vector2(28, 10), Constants.Yellow));
+nodes.Add(new NodeView(nl2, new Vector2(56, 10), Constants.Purple));
 
 ng1.Outputs.ElementAt(0).Connect(bm1.Inputs.ElementAt(0));
 ng2.Outputs.ElementAt(0).Connect(bm1.Inputs.ElementAt(1));
 bm1.Outputs.ElementAt(0).Connect(bm2.Inputs.ElementAt(0));
 ng3.Outputs.ElementAt(0).Connect(bm2.Inputs.ElementAt(1));
-bm2.Outputs.ElementAt(0).Connect(nl.Inputs.ElementAt(0));
+bm2.Outputs.ElementAt(0).Connect(nl1.Inputs.ElementAt(0));
+
+var sout = sch2.AddOutput<List<bool>>((BitPin)bm2.Outputs.ElementAt(0));
+sout.Connect(nl2.Inputs.ElementAt(0));
 
 /*ticker.AddListener(ng1);
 ticker.AddListener(ng2);
@@ -145,6 +151,7 @@ ticker.AddListener(bm1);
 ticker.AddListener(bm2);
 ticker.AddListener(nl);*/
 ticker.AddListener(sch2);
+ticker.AddListener(nl2);
 
 /*var firstNode = new NodeGenerate();
 OneOf<NodeNegate, NodeGenerate> lastNode = firstNode;

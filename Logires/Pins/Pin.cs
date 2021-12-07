@@ -154,13 +154,24 @@ public abstract class Pin<T> : IPin, IPin<T>
         return isDifferentSide && (PinsConverter.HasConvertator<T, T2>() || isSameType);
     }
 
-    public T2 RetrieveValue<T2>()
+    public dynamic? GetValue()
     {
-        if (Value == null)
+        return Value;
+    }
+
+    public void SetValueFrom(IPin other)
+    {
+        var convertator = PinsConverter.GetConvertator(this, other);
+        if (convertator == null)
         {
             throw new InvalidOperationException();
         }
 
+        Value = convertator.Invoke(other.GetValue());
+    }
+
+    public T2 RetrieveValue<T2>()
+    {
         var convertator = PinsConverter.GetConvertator<T, T2>();
         if (convertator == null)
         {
@@ -186,11 +197,11 @@ public abstract class Pin<T> : IPin, IPin<T>
         var otherPin = _linkedPins[0];
         otherPin.RequestUpdate(ticks);
 
-        if (otherPin is Pin<T> other)
+        /*if (otherPin is Pin<T> other)
         {
             Value = other.Value;
             return;
-        }
+        }*/
 
         Value = otherPin.RetrieveValue<T>();
     }
@@ -217,4 +228,5 @@ public abstract class Pin<T> : IPin, IPin<T>
     }
 
     public abstract T GetDefaultValue();
+    public abstract Pin<T> Clone(bool isInput);
 }

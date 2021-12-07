@@ -35,8 +35,28 @@ public static class PinsConverter
 		return _convertions.ContainsKey(hc);
 	}
 
+	public static Func<dynamic, dynamic>? GetConvertator(IPin pin1, IPin pin2)
+	{
+		var t1 = pin1.GetType().BaseType!.GetGenericArguments()[0];
+		var t2 = pin2.GetType().BaseType!.GetGenericArguments()[0];
+
+		if (t1 == t2)
+        {
+			return (v) => Convert.ChangeType(v, t2);
+        }
+
+		var hc = GetHashCode(t1, t2);
+
+		return _convertions[hc] as Func<dynamic, dynamic>;
+	}
+
 	public static Func<T1, T2>? GetConvertator<T1, T2>()
 	{
+		if (typeof(T1) == typeof(T2))
+        {
+			return (v) => (T2)(v as object)!;
+        }
+
 		var hc = GetHashCode<T1, T2>();
 
 		return _convertions[hc] as Func<T1, T2>;
@@ -121,6 +141,11 @@ public static class PinsConverter
 
 	private static int GetHashCode<T1, T2>()
 	{
-		return HashCode.Combine(typeof(T1), typeof(T2));
+		return GetHashCode(typeof(T1), typeof(T2));
+	}
+
+	private static int GetHashCode(Type t1, Type t2)
+	{
+		return HashCode.Combine(t1, t2);
 	}
 }

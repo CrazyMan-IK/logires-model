@@ -11,4 +11,9 @@ public class BooleanPin : Pin<bool>
     {
         return false;
     }
+
+    public override Pin<bool> Clone(bool isInput)
+    {
+        return new BooleanPin(isInput);
+    }
 }

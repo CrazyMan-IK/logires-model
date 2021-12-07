@@ -10,6 +10,8 @@ public interface IPin
 	bool IsConnectedWith(IPin other);
 	bool CanConnectTo<T2>(IPin other);
 
+	dynamic? GetValue();
+	void SetValueFrom(IPin other);
 	T2 RetrieveValue<T2>();
 	void Update(long ticks);
 	void MarkDirty();
