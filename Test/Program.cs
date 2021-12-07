@@ -71,6 +71,17 @@ var bm2 = new BitMerger();
 
 var nl = new NodeLog();
 
+var sch2 = new Scheme(new List<Node>() {
+	ng1,
+	ng2,
+	ng3,
+
+	bm1,
+	bm2,
+
+	nl
+});
+
 /*nl.Logged += (value) => {
 	Console.Write(value);
 	Console.Write(" ");
@@ -127,12 +138,13 @@ bm1.Outputs.ElementAt(0).Connect(bm2.Inputs.ElementAt(0));
 ng3.Outputs.ElementAt(0).Connect(bm2.Inputs.ElementAt(1));
 bm2.Outputs.ElementAt(0).Connect(nl.Inputs.ElementAt(0));
 
-ticker.AddListener(ng1);
+/*ticker.AddListener(ng1);
 ticker.AddListener(ng2);
 ticker.AddListener(ng3);
 ticker.AddListener(bm1);
 ticker.AddListener(bm2);
-ticker.AddListener(nl);
+ticker.AddListener(nl);*/
+ticker.AddListener(sch2);
 
 /*var firstNode = new NodeGenerate();
 OneOf<NodeNegate, NodeGenerate> lastNode = firstNode;

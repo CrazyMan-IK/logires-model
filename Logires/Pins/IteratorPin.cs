@@ -1,14 +1,14 @@
 namespace Logires.Pins;
 
-public class IteratorPin : Pin<LinkedListNode<object>>
+public class IteratorPin : Pin<LinkedListNode<object>?>
 {
     public IteratorPin(bool isInput) : base(isInput)
     {
 
     }
 
-    public override LinkedListNode<object> GetDefaultValue()
+    public override LinkedListNode<object>? GetDefaultValue()
     {
-        return new LinkedListNode<object>(0);
+        return null;
     }
 }
