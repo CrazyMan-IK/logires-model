@@ -88,6 +88,7 @@ namespace Logires.Pins;
 
 public abstract class Pin<T> : IPin, IPin<T>
 {
+    private readonly List<IPin> _receivers = new List<IPin>();
     private readonly List<IPin> _linkedPins = new List<IPin>();
     private readonly bool _isInput = true;
     private bool _needUpdate = false;
@@ -104,7 +105,7 @@ public abstract class Pin<T> : IPin, IPin<T>
 
     public void Connect(IPin other)
     {
-        if (!CanConnectTo<T>(other))
+        if (!other.CanConnectTo<T>(this))
         {
             throw new InvalidOperationException();
         }
@@ -128,6 +129,22 @@ public abstract class Pin<T> : IPin, IPin<T>
 
         _linkedPins.Add(other);
         other.Connect(this);
+    }
+
+    public void ConnectReceiver(IPin other)
+    {
+				if (!other.CanConnectTo<T>(this))
+				{
+					  throw new InvalidOperationException();
+				}
+    
+				if (_receivers.Contains(other))
+				{
+					  return;
+				}
+    
+    	  _receivers.Add(other);
+    	  other.ConnectReceiver(this);
     }
 
     public void Disconnect(IPin other)
@@ -154,20 +171,9 @@ public abstract class Pin<T> : IPin, IPin<T>
         return isDifferentSide && (PinsConverter.HasConvertator<T, T2>() || isSameType);
     }
 
-    public dynamic? GetValue()
+    public void SetValueFrom<T2>(IPin other)
     {
-        return Value;
-    }
-
-    public void SetValueFrom(IPin other)
-    {
-        var convertator = PinsConverter.GetConvertator(this, other);
-        if (convertator == null)
-        {
-            throw new InvalidOperationException();
-        }
-
-        Value = convertator.Invoke(other.GetValue());
+    	  Value = other.RetrieveValue<T>();
     }
 
     public T2 RetrieveValue<T2>()
@@ -204,6 +210,11 @@ public abstract class Pin<T> : IPin, IPin<T>
         }*/
 
         Value = otherPin.RetrieveValue<T>();
+
+        foreach (var pin in _receivers)
+        {
+        	  pin.SetValueFrom<T>(this);
+        }
     }
 
     public void MarkDirty()

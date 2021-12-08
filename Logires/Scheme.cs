@@ -11,8 +11,6 @@ public class Scheme : Node, IHaveInputs, IHaveOutputs
     private readonly List<IPin> _innerOutputs = new List<IPin>();
     private readonly List<IPin> _outerOutputs = new List<IPin>();
     private readonly List<IPin> _innerInputs = new List<IPin>();
-    private readonly List<(IPin, IPin)> _inputLinks = new List<(IPin, IPin)>();
-    private readonly List<(IPin, IPin)> _outputLinks = new List<(IPin, IPin)>();
 
     public Scheme(IEnumerable<Node> nodes)
     {
@@ -35,8 +33,9 @@ public class Scheme : Node, IHaveInputs, IHaveOutputs
         _outerInputs.Add(outer);
         _innerOutputs.Add(inner);
 
-        _inputLinks.Add((outer, inner));
+        //_inputLinks.Add(outer);
 
+				outer.ConnectReceiver(inner);
         input.Connect(inner);
 
         return outer;
@@ -50,8 +49,9 @@ public class Scheme : Node, IHaveInputs, IHaveOutputs
         _outerOutputs.Add(outer);
         _innerInputs.Add(inner);
 
-        _outputLinks.Add((inner, outer));
+        //_outputLinks.Add(inner);
 
+				inner.ConnectReceiver(outer);
         output.Connect(inner);
 
         return outer;
@@ -59,10 +59,11 @@ public class Scheme : Node, IHaveInputs, IHaveOutputs
 
     public override void Update(long ticks)
     {
-        foreach (var link in _inputLinks)
+        /*foreach (var link in _inputLinks)
         {
-            link.Item2.SetValueFrom(link.Item1);
-        }
+            //link.Item2.SetValueFrom(link.Item1);
+            link.Item1.RequestUpdate(ticks);
+        }*/
 
         foreach (var node in _nodes)
         {
@@ -74,9 +75,13 @@ public class Scheme : Node, IHaveInputs, IHaveOutputs
             node.Tick(ticks);
         }
 
-        foreach (var link in _outputLinks)
+        foreach (var inner in _innerInputs)
         {
-            link.Item2.SetValueFrom(link.Item1);
+            //link.Item2.SetValueFrom(link.Item1);
+            inner.RequestUpdate(ticks);
         }
+        
+        Console.WriteLine(_innerInputs[0]);
+        Console.WriteLine(_outerOutputs[0]);
     }
 }

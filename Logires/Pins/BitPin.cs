@@ -16,4 +16,9 @@ public class BitPin : Pin<List<bool>>
     {
         return new BitPin(isInput);
     }
+
+    public override string ToString()
+    {
+    	  return $"{nameof(BitPin)}: [{string.Join(", ", Value)}]";
+    }
 }

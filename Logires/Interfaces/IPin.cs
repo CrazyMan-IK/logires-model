@@ -6,12 +6,12 @@ public interface IPin
 	bool IsInput { get; }
 	
 	void Connect(IPin other);
+	void ConnectReceiver(IPin other);
 	void Disconnect(IPin other);
 	bool IsConnectedWith(IPin other);
 	bool CanConnectTo<T2>(IPin other);
 
-	dynamic? GetValue();
-	void SetValueFrom(IPin other);
+	void SetValueFrom<T2>(IPin other);
 	T2 RetrieveValue<T2>();
 	void Update(long ticks);
 	void MarkDirty();

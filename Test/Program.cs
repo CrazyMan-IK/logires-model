@@ -1,4 +1,5 @@
 using BrailleCanvas;
+using BrailleCanvas.Interfaces;
 using BrailleCanvas.Figures;
 using BrailleCanvas.Models;
 using Logires;
@@ -126,14 +127,16 @@ rg.Outputs.ElementAt(0).Connect(imn.Inputs.ElementAt(0));
 ticker.AddListener(rg);
 ticker.AddListener(imn);*/
 
-/*nodes.Add(new NodeView(ng1, new Vector2(4, 2), Constants.Purple));
+//*/
+nodes.Add(new NodeView(ng1, new Vector2(4, 2), Constants.Purple));
 nodes.Add(new NodeView(ng2, new Vector2(4, 6), Constants.Purple));
 nodes.Add(new NodeView(ng3, new Vector2(4, 10), Constants.Purple));
 nodes.Add(new NodeView(bm1, new Vector2(16, 2), Constants.Purple));
 nodes.Add(new NodeView(bm2, new Vector2(28, 10), Constants.Purple));
-nodes.Add(new NodeView(nl1, new Vector2(40, 10), Constants.Purple));*/
-nodes.Add(new NodeView(sch2, new Vector2(28, 10), Constants.Yellow));
-nodes.Add(new NodeView(nl2, new Vector2(56, 10), Constants.Purple));
+nodes.Add(new NodeView(nl1, new Vector2(40, 10), Constants.Purple));
+//*/
+nodes.Add(new NodeView(sch2, new Vector2(28, 18), Constants.Yellow));
+nodes.Add(new NodeView(nl2, new Vector2(56, 18), Constants.Purple));
 
 ng1.Outputs.ElementAt(0).Connect(bm1.Inputs.ElementAt(0));
 ng2.Outputs.ElementAt(0).Connect(bm1.Inputs.ElementAt(1));
@@ -288,6 +291,7 @@ foreach (var node in nodes)
     canvas.Append(node.Figure);
 }
 
+canvas.Append(new Line(new IReadOnlyVector2<float>[] { new Vector2(0, 14), new Vector2(columns, 14) }, Constants.White));
 canvas.Append(frame);
 
 while (true)
