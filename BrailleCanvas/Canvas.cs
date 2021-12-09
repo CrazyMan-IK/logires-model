@@ -59,6 +59,14 @@ public class Canvas
         _items.Add((z, item));
     }
 
+    public void Append(IEnumerable<IFigure> items)
+    {
+    	  foreach (var item in items)
+    	  {
+    	      Append(item);
+    	  }
+    }
+
     //public ReadOnlySpan<byte> StringValue()
     public string StringValue()
     {

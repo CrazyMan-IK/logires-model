@@ -49,7 +49,8 @@ static void OnExit()
 }
 
 var canvas = new Canvas(new Vector2Int(columns, rows));
-var nodes = new List<NodeView>();
+var sch1 = new SchemeView();
+var sch2 = new SchemeView();
 var frame = new Item(CreateFrame(), Vector2.Zero, false, Constants.White);
 
 var ticker = new Ticker(4);
@@ -71,9 +72,9 @@ var bm1 = new BitMerger();
 var bm2 = new BitMerger();
 
 var nl1 = new NodeLog();
-var nl2 = new NodeLog();
+//var nl2 = new NodeLog();
 
-var sch2 = new Scheme(new List<Node>() {
+/*var sch2 = new Scheme(new List<Node>() {
 	ng1,
 	ng2,
 	ng3,
@@ -82,7 +83,12 @@ var sch2 = new Scheme(new List<Node>() {
 	bm2,
 
 	nl1
-});
+});*/
+
+//var sch1 = new Scheme(null);
+//sch1.Add(sch2);
+
+//sch2.Add(sch1);
 
 /*nl.Logged += (value) => {
 	Console.Write(value);
@@ -128,24 +134,27 @@ ticker.AddListener(rg);
 ticker.AddListener(imn);*/
 
 //*/
-nodes.Add(new NodeView(ng1, new Vector2(4, 2), Constants.Purple));
-nodes.Add(new NodeView(ng2, new Vector2(4, 6), Constants.Purple));
-nodes.Add(new NodeView(ng3, new Vector2(4, 10), Constants.Purple));
-nodes.Add(new NodeView(bm1, new Vector2(16, 2), Constants.Purple));
-nodes.Add(new NodeView(bm2, new Vector2(28, 10), Constants.Purple));
-nodes.Add(new NodeView(nl1, new Vector2(40, 10), Constants.Purple));
+sch1.Add(new NodeView(ng1, new Vector2(16, 3), Constants.Purple));
+sch1.Add(new NodeView(ng3, new Vector2(16, 11), Constants.Purple));
+sch1.Add(new NodeView(bm1, new Vector2(28, 3), Constants.Purple));
+sch1.Add(new NodeView(bm2, new Vector2(40, 11), Constants.Purple));
+//sch1.Add(new NodeView(nl1, new Vector2(56, 11), Constants.Purple));
 //*/
-nodes.Add(new NodeView(sch2, new Vector2(28, 18), Constants.Yellow));
-nodes.Add(new NodeView(nl2, new Vector2(56, 18), Constants.Purple));
+sch2.Add(new NodeView(ng2, new Vector2(16, 18), Constants.Purple));
+sch2.Add(new NodeView(sch1.Node, new Vector2(28, 18), Constants.Yellow));
+sch2.Add(new NodeView(nl1, new Vector2(56, 18), Constants.Purple));
 
 ng1.Outputs.ElementAt(0).Connect(bm1.Inputs.ElementAt(0));
-ng2.Outputs.ElementAt(0).Connect(bm1.Inputs.ElementAt(1));
+//ng2.Outputs.ElementAt(0).Connect(bm1.Inputs.ElementAt(1));
 bm1.Outputs.ElementAt(0).Connect(bm2.Inputs.ElementAt(0));
 ng3.Outputs.ElementAt(0).Connect(bm2.Inputs.ElementAt(1));
-bm2.Outputs.ElementAt(0).Connect(nl1.Inputs.ElementAt(0));
+//bm2.Outputs.ElementAt(0).Connect(nl1.Inputs.ElementAt(0));
 
-var sout = sch2.AddOutput<List<bool>>((BitPin)bm2.Outputs.ElementAt(0));
-sout.Connect(nl2.Inputs.ElementAt(0));
+var sin = sch1.AddInput<List<bool>>((BitPin)bm1.Inputs.ElementAt(1));
+sin.Connect(ng2.Outputs.ElementAt(0));
+
+var sout = sch1.AddOutput<List<bool>>((BitPin)bm2.Outputs.ElementAt(0));
+sout.Connect(nl1.Inputs.ElementAt(0));
 
 /*ticker.AddListener(ng1);
 ticker.AddListener(ng2);
@@ -153,8 +162,9 @@ ticker.AddListener(ng3);
 ticker.AddListener(bm1);
 ticker.AddListener(bm2);
 ticker.AddListener(nl);*/
+ticker.AddListener(sch1);
 ticker.AddListener(sch2);
-ticker.AddListener(nl2);
+//ticker.AddListener(nl2);
 
 /*var firstNode = new NodeGenerate();
 OneOf<NodeNegate, NodeGenerate> lastNode = firstNode;
@@ -225,72 +235,16 @@ ticker.AddListener(nl2);*/
 
 ticker.Start();
 
-foreach (var node in nodes)
+//var schV = new SchemeView(sch2);
+//canvas.Append(schV.Visual);
+
+/*foreach (var node in nodes)
 {
-    if (node.Node is not IHaveOutputs haveOutputs)
-    {
-        continue;
-    }
+    canvas.Append(node.Visual);
+}*/
 
-    foreach (var output in haveOutputs.Outputs)
-    {
-        /*if (output is not BooleanPin booleanOutput)
-        {
-            continue;
-        }*/
-
-        foreach (var node2 in nodes)
-        {
-            if (node == node2)
-            {
-                continue;
-            }
-
-            if (node2.Node is not IHaveInputs haveInputs)
-            {
-                continue;
-            }
-
-            foreach (var input in haveInputs.Inputs)
-            {
-                if (!output.IsConnectedWith(input))
-                {
-                    continue;
-                }
-
-                if (output is BooleanPin booleanOutput)
-                {
-                    canvas.Append(new Line(new[] { node.Position, node2.Position }, new Ternary<Color>(() => booleanOutput.Value, Constants.Green, Constants.Red)));
-                }
-                else if (output is BitPin bitOutput)
-                {
-                    canvas.Append(new Line(new[] { node.Position, node2.Position }, new Gradient(() =>
-                    {
-                        var totalCount = bitOutput.Value.Count;
-                        if (totalCount == 0)
-                        {
-                            return 0;
-                        }
-
-                        var activeCount = bitOutput.Value.Count(x => x);
-
-                        return activeCount * 1.0f / totalCount;
-                    }, Constants.Red, Constants.Blue, Constants.Green)));
-                }
-                else
-                {
-                    canvas.Append(new Line(new[] { node.Position, node2.Position }, Constants.Yellow));
-                }
-            }
-        }
-    }
-}
-
-foreach (var node in nodes)
-{
-    canvas.Append(node.Figure);
-}
-
+canvas.Append(sch1.Visual);
+canvas.Append(sch2.Visual);
 canvas.Append(new Line(new IReadOnlyVector2<float>[] { new Vector2(0, 14), new Vector2(columns, 14) }, Constants.White));
 canvas.Append(frame);
 
