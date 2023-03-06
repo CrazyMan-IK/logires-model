@@ -49,8 +49,8 @@ static void OnExit()
 }
 
 var canvas = new Canvas(new Vector2Int(columns, rows));
-var sch1 = new SchemeView();
-var sch2 = new SchemeView();
+var sch1 = new SchemeView(new Vector2(0, 0), new Vector2(columns, rows / 2.0f));
+var sch2 = new SchemeView(new Vector2(0, rows / 2.0f), new Vector2(columns, rows / 2.0f));
 var frame = new Item(CreateFrame(), Vector2.Zero, false, Constants.White);
 
 var ticker = new Ticker(4);
@@ -136,12 +136,12 @@ ticker.AddListener(imn);*/
 //*/
 sch1.Add(new NodeView(ng1, new Vector2(16, 3), Constants.Purple));
 sch1.Add(new NodeView(ng3, new Vector2(16, 11), Constants.Purple));
-sch1.Add(new NodeView(bm1, new Vector2(28, 3), Constants.Purple));
+sch1.Add(new NodeView(bm1, new Vector2(28, 7), Constants.Purple));
 sch1.Add(new NodeView(bm2, new Vector2(40, 11), Constants.Purple));
 //sch1.Add(new NodeView(nl1, new Vector2(56, 11), Constants.Purple));
 //*/
 sch2.Add(new NodeView(ng2, new Vector2(16, 18), Constants.Purple));
-sch2.Add(new NodeView(sch1.Node, new Vector2(28, 18), Constants.Yellow));
+sch2.Add(new NodeView(sch1.Scheme, new Vector2(28, 18), Constants.Yellow));
 sch2.Add(new NodeView(nl1, new Vector2(56, 18), Constants.Purple));
 
 ng1.Outputs.ElementAt(0).Connect(bm1.Inputs.ElementAt(0));

@@ -25,6 +25,11 @@ public static class MathExtensions
         return MathF.Round(value, digits, MidpointRounding.AwayFromZero);
     }
 
+    public static float Remap(float value, float minFrom, float maxFrom, float minTo, float maxTo)
+    {
+        return (value - minFrom) / (maxFrom - minFrom) * (maxTo - minTo) + minTo;
+    }
+
     public static float Max(params float[] values)
     {
     	var max = float.MinValue;

@@ -8,22 +8,19 @@ namespace Test;
 
 public class NodeView : IHasVisual
 {
-    //private Node _node;
-    //private IReadOnlyVector2<float> _position;
-    private IFigure _figure;
+    private readonly IFigure _figure;
 
     public NodeView(Node node, IReadOnlyVector2<float> position, Color color)
     {
         Node = node ?? throw new ArgumentNullException(nameof(node));
-        Position = position;//new RefVector2(position.X, position.Y);
+        Position = position;
         Color = color;
         _figure = new Ellipse(Position.Subtract(new Vector2(4, 2)), new Vector2(8, 4), true, Color);
     }
 
-    public Node Node { get; private set; }
-    public IReadOnlyVector2<float> Position { get; private set; }
-    //public RefVector2 Position { get; private set; }
-    public Color Color { get; private set; }
+    public Node Node { get; }
+    public IReadOnlyVector2<float> Position { get; }
+    public Color Color { get; }
     public IEnumerable<IFigure> Visual
     {
     	  get

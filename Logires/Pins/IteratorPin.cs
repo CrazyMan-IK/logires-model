@@ -11,9 +11,4 @@ public class IteratorPin : Pin<LinkedListNode<object>?>
     {
         return null;
     }
-
-    public override Pin<LinkedListNode<object>?> Clone(bool isInput)
-    {
-        return new IteratorPin(isInput);
-    }
 }

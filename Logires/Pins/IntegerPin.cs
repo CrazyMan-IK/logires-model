@@ -11,9 +11,4 @@ public class IntegerPin : Pin<int>
     {
         return 0;
     }
-
-    public override Pin<int> Clone(bool isInput)
-    {
-        return new IntegerPin(isInput);
-    }
 }

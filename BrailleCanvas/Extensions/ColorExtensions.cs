@@ -9,12 +9,29 @@ public static class ColorExtensions
     {
         return a + (b - a) * t;
     }
-    
-    public static Color Lerp(float t, params Color[] colors)
+
+    /*public static Color Lerp(float t, params Color[] colors)
     {
         var delta = t * (colors.Length + 1.0f);
 
         var res = colors.Select((x, i) => (index: i * 1.0f, color: x)).Aggregate(new Color(), (res, x) =>
+        {
+            if (x.index == 0)
+            {
+                return x.color;
+            }
+
+            return Lerp(res, x.color, MathExtensions.Clamp(delta - x.index, 0, 1));
+        });
+
+        return res;
+    }*/
+
+    public static Color Lerp(float t, params Color[] colors)
+    {
+        var delta = t * (colors.Length - 1) + 1;
+
+        var res = colors.Select((x, i) => (index: i, color: x)).Aggregate(new Color(), (res, x) =>
         {
             if (x.index == 0)
             {

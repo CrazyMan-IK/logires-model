@@ -133,18 +133,18 @@ public abstract class Pin<T> : IPin, IPin<T>
 
     public void ConnectReceiver(IPin other)
     {
-				if (!other.CanConnectTo<T>(this))
-				{
-					  throw new InvalidOperationException();
-				}
-    
-				if (_receivers.Contains(other))
-				{
-					  return;
-				}
-    
-    	  _receivers.Add(other);
-    	  other.ConnectReceiver(this);
+        if (!other.CanConnectTo<T>(this))
+        {
+            throw new InvalidOperationException();
+        }
+
+        if (_receivers.Contains(other))
+        {
+            return;
+        }
+
+        _receivers.Add(other);
+        other.ConnectReceiver(this);
     }
 
     public void Disconnect(IPin other)
@@ -173,7 +173,7 @@ public abstract class Pin<T> : IPin, IPin<T>
 
     public void SetValueFrom<T2>(IPin other)
     {
-    	  Value = other.RetrieveValue<T>();
+        Value = other.RetrieveValue<T>();
     }
 
     public T2 RetrieveValue<T2>()
@@ -213,7 +213,7 @@ public abstract class Pin<T> : IPin, IPin<T>
 
         foreach (var pin in _receivers)
         {
-        	  pin.SetValueFrom<T>(this);
+            pin.SetValueFrom<T>(this);
         }
     }
 
@@ -239,5 +239,4 @@ public abstract class Pin<T> : IPin, IPin<T>
     }
 
     public abstract T GetDefaultValue();
-    public abstract Pin<T> Clone(bool isInput);
 }
