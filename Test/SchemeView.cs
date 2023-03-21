@@ -7,10 +7,11 @@ using BrailleCanvas.Models;
 using BrailleCanvas.Figures;
 using BrailleCanvas.Interfaces;
 using BrailleCanvas.Extensions;
+using Test.Interfaces;
 
 namespace Test;
 
-public class SchemeView : ITickable
+public class SchemeView : ITickable, IHasVisual
 {
     private readonly Scheme _scheme = new Scheme();
     private readonly List<NodeView> _nodes = new List<NodeView>();

@@ -1,12 +1,14 @@
+using System.Text;
+using System.Diagnostics;
 using BrailleCanvas;
 using BrailleCanvas.Interfaces;
+using BrailleCanvas.Extensions;
 using BrailleCanvas.Figures;
 using BrailleCanvas.Models;
 using Logires;
 using Logires.Interfaces;
 using Logires.Nodes;
 using Logires.Pins;
-using System.Text;
 using Test;
 
 const int rows = 25;
@@ -50,10 +52,11 @@ static void OnExit()
 
 var canvas = new Canvas(new Vector2Int(columns, rows));
 var sch1 = new SchemeView(new Vector2(0, 0), new Vector2(columns, rows / 2.0f));
-var sch2 = new SchemeView(new Vector2(0, rows / 2.0f), new Vector2(columns, rows / 2.0f));
+var sch2 = new SchemeView(new Vector2(0, 0), new Vector2(columns, rows));
 var frame = new Item(CreateFrame(), Vector2.Zero, false, Constants.White);
+var fps = new Item("AVG 0 (0 ms)", Vector2.One, false, Constants.White);
 
-var ticker = new Ticker(4);
+var ticker = new Ticker(60);
 
 /*var n1 = new NodeTrue();
 var ng = new NodeGenerate(4);
@@ -140,9 +143,9 @@ sch1.Add(new NodeView(bm1, new Vector2(28, 7), Constants.Purple));
 sch1.Add(new NodeView(bm2, new Vector2(40, 11), Constants.Purple));
 //sch1.Add(new NodeView(nl1, new Vector2(56, 11), Constants.Purple));
 //*/
-sch2.Add(new NodeView(ng2, new Vector2(16, 18), Constants.Purple));
-sch2.Add(new NodeView(sch1.Scheme, new Vector2(28, 18), Constants.Yellow));
-sch2.Add(new NodeView(nl1, new Vector2(56, 18), Constants.Purple));
+sch2.Add(new NodeView(ng2, new Vector2(20, 12), Constants.Purple));
+sch2.Add(new NodeView(sch1.Scheme, new Vector2(38, 12), Constants.Yellow));
+sch2.Add(new NodeView(nl1, new Vector2(56, 12), Constants.Purple));
 
 ng1.Outputs.ElementAt(0).Connect(bm1.Inputs.ElementAt(0));
 //ng2.Outputs.ElementAt(0).Connect(bm1.Inputs.ElementAt(1));
@@ -233,8 +236,6 @@ ticker.AddListener(na2);
 ticker.AddListener(nl1);
 ticker.AddListener(nl2);*/
 
-ticker.Start();
-
 //var schV = new SchemeView(sch2);
 //canvas.Append(schV.Visual);
 
@@ -243,13 +244,36 @@ ticker.Start();
     canvas.Append(node.Visual);
 }*/
 
-canvas.Append(sch1.Visual);
+//canvas.Append(sch1.Visual);
 canvas.Append(sch2.Visual);
-canvas.Append(new Line(new IReadOnlyVector2<float>[] { new Vector2(0, 14), new Vector2(columns, 14) }, Constants.White));
+//canvas.Append(new Line(new IReadOnlyVector2<float>[] { new Vector2(0, 14), new Vector2(columns, 14) }, Constants.White));
 canvas.Append(frame);
+canvas.Append(fps);
 
+Console.Clear();
+var timer = Stopwatch.StartNew();
+var frames = 0;
+var total = 0.0f;
 while (true)
 {
+		var deltaTime = timer.ElapsedMilliseconds / 1000f;
+
+    ticker.Update(deltaTime);
+    timer.Restart();
+
+    total += deltaTime;
+    frames++;
+
+		while (total >= 1)
+		{
+				var totalDelta = total / frames;
+		
+    		fps.Text = $"AVG {MathExtensions.Round(1 / totalDelta)} ({MathExtensions.Round(totalDelta * 1000, 2)} ms)";
+
+    		total -= 1;
+    		frames = 0;
+    }
+
     Console.WriteLine(canvas.StringValue());
     Console.SetCursorPosition(0, 0);
 }

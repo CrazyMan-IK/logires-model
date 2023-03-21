@@ -1,4 +1,4 @@
-﻿using Timer = System.Timers.Timer;
+﻿//using Timer = Logires.Timer;
 using Logires.Interfaces;
 
 namespace Logires;
@@ -11,9 +11,8 @@ public class Ticker
 
 	public Ticker(int fps = 60)
 	{
-		_timer = new Timer((1.0 / fps) * 1000);
-		_timer.Elapsed += (s, e) => Tick();
-		_timer.AutoReset = true;
+		_timer = new Timer(1.0f / fps);
+		_timer.Ticked += Tick;
 	}
 
 	public long Ticks => _ticks;
@@ -23,9 +22,14 @@ public class Ticker
 		_timer.Start();
 	}
 
+	public void Update(float deltaTime)
+	{
+		_timer.Update(deltaTime);
+	}
+
 	public void Pause()
 	{
-		_timer.Stop();
+		_timer.Pause();
 	}
 
 	public void AddListener(ITickable listener)
@@ -50,7 +54,6 @@ public class Ticker
 			listener.Tick(_ticks);
 		}
 
-		//Console.WriteLine("|---------------------------------------------|");
 		_ticks++;
 	}
 }

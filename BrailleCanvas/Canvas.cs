@@ -84,13 +84,13 @@ public class Canvas
         {
             var lines = item.StringValue().Split("\n");
 
-            //var x = item.Position.X * 0;
-            //var y = item.Position.Y * 0;
-            var y = 0;
+            var x = (int)MathExtensions.Round(item.Position.X);
+            var y = (int)MathExtensions.Round(item.Position.Y);
+            //var y = 0;
 
             foreach (var line in lines)
             {
-                Draw(item, _matrix, line, 0, y++);
+                Draw(item, _matrix, line, x, y++);
             }
         }
 
@@ -215,9 +215,13 @@ public class Canvas
                     result = (char)(chr | oldChr);
                 }
             }
-            else
+            else if (chr != 0x2800)
             {
                 result = chr;
+            }
+            else
+            {
+            		result = oldChr;
             }
 
             //result = chr;

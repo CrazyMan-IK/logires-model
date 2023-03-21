@@ -53,9 +53,9 @@ public class Ellipse : IFilledFigure
         var cSizeX = MathF.Ceiling(Size.X);
         var cSizeY = MathF.Ceiling(Size.Y);
 
-        for (int i = 0; i < cSizeY + 1 + cPositionY; i++)
+        for (int i = 0; i < cSizeY + 1; i++)
         {
-            for (int j = 0; j < cSizeX + 1 + cPositionX; j++)
+            for (int j = 0; j < cSizeX + 1; j++)
             {
                 _result += '\u2800';
             }
@@ -68,8 +68,8 @@ public class Ellipse : IFilledFigure
         for (float i = 0; i <= 1; i += Constants.FigureTimeStep)
         {
             var rad = MathExtensions.Lerp(0, MathF.Tau, i);
-            var curX = Position.X + hSize.X + MathF.Sin(rad) * hSize.X;
-            var curY = Position.Y + hSize.Y + MathF.Cos(rad) * -hSize.Y;
+            var curX = cPositionX - Position.X + hSize.X + MathF.Sin(rad) * hSize.X;
+            var curY = cPositionY - Position.Y + hSize.Y + MathF.Cos(rad) * -hSize.Y;
             var point = new Vector2(curX, curY);
 
             if (point.X < 0 || point.Y < 0)
@@ -85,7 +85,7 @@ public class Ellipse : IFilledFigure
             var cellX = MathF.Max(MathExtensions.Round(rX), 0);
             var cellY = MathF.Max(MathExtensions.Round(rY), 0);
 
-            var index = (int)MathF.Truncate(cellX + cellY * (cSizeX + 1 + cPositionX) + cellY);
+            var index = (int)MathF.Truncate(cellX + cellY * (cSizeX + 1) + cellY);
 
             var oldCode = _result[index] - 0x2800;
             var old = oldCode >= 0x00 && oldCode <= 0xff ? oldCode : 0;

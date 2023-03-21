@@ -8,6 +8,7 @@ namespace BrailleCanvas.Figures;
 public class Line : IFigure
 {
     private char[] _result = Array.Empty<char>();
+    private string _text = "";
     private int _oldPointsHash = 0;
 
     public Line(IEnumerable<IReadOnlyVector2<float>> points, OneOf<Color, IHasValue<Color>> color)
@@ -37,7 +38,7 @@ public class Line : IFigure
 
         //Update();
 
-        return string.Join("", _result);
+        return _text;
     }
 
     private int GetPointsHashCode()
@@ -67,8 +68,8 @@ public class Line : IFigure
         var cSizeX = (int)MathF.Ceiling(Size.X);
         var cSizeY = (int)MathF.Ceiling(Size.Y);
 
-        var aSizeX = cSizeX + 2 + cPositionX;
-        var aSizeY = cSizeY + 1 + cPositionY;
+        var aSizeX = cSizeX + 2;
+        var aSizeY = cSizeY + 1;
 
         _result = new char[aSizeX * aSizeY];
         for (int i = 0; i < aSizeY; i++)
@@ -89,7 +90,7 @@ public class Line : IFigure
         var accum = 0;
         for (float i = 0; i <= pointsList.Count - 1; i += Constants.FigureTimeStep)
         {
-            var point = GetPoint(pointsList, i);
+            var point = GetPoint(pointsList, i, cPositionX, cPositionY);
             //Console.WriteLine(point);
             //const curY = lerp(start.y, end.y, i);
 
@@ -108,7 +109,7 @@ public class Line : IFigure
             var cellY = MathF.Max(MathExtensions.Round(rY), 0);
             //Console.WriteLine(new Vector2(cellX, cellY));
 
-            var index = (int)MathF.Truncate(cellX + cellY * (cSizeX + 1 + cPositionX) + cellY);
+            var index = (int)MathF.Truncate(cellX + cellY * (cSizeX + 1) + cellY);
 
             //const index = Math.trunc(cellX + cellY * (size.x * 2 + 1) + cellY);
             var oldCode = _result[index] - 0x2800;
@@ -120,13 +121,17 @@ public class Line : IFigure
 
             accum = 0;
         }
+
+        _text = string.Join("", _result);
     }
 
-    private static IReadOnlyVector2<float> GetPoint(List<IReadOnlyVector2<float>> points, float i)
+    private static IReadOnlyVector2<float> GetPoint(List<IReadOnlyVector2<float>> points, float i, float cPositionX = 0, float cPositionY = 0)
     {
         var p1 = points[(int)MathF.Floor(i)];
         var p2 = points[(int)MathF.Floor(i) + 1];
 
-        return Vector2Extensions.Lerp(p1, p2, MathExtensions.Mod(i, 1 + Constants.FigureTimeStep));
+        var result = Vector2Extensions.Lerp(p1, p2, MathExtensions.Mod(i, 1 + Constants.FigureTimeStep));
+
+        return new Vector2(result.X - cPositionX, result.Y - cPositionY);
     }
 }
