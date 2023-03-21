@@ -7,24 +7,31 @@ namespace BrailleCanvas.Figures;
 
 public class Line : IFigure
 {
+		private readonly List<IReadOnlyVector2<float>> _points = new List<IReadOnlyVector2<float>>();
     private char[] _result = Array.Empty<char>();
     private string _text = "";
     private int _oldPointsHash = 0;
 
     public Line(IEnumerable<IReadOnlyVector2<float>> points, OneOf<Color, IHasValue<Color>> color)
     {
-        Points = points;
+        _points.AddRange(points);
         Color = color;
 
         Size = Vector2.Zero;
         Position = Vector2.Zero;
     }
 
-    public IEnumerable<IReadOnlyVector2<float>> Points { get; private set; }
+    public IEnumerable<IReadOnlyVector2<float>> Points => _points;
     public IReadOnlyVector2<float> Size { get; private set; }
     public IReadOnlyVector2<float> Position { get; private set; }
     public int? ZIndex { get; private set; }
     public OneOf<Color, IHasValue<Color>> Color { get; private set; }
+
+		public void SetPoints(IEnumerable<IReadOnlyVector2<float>> points)
+		{
+				_points.Clear();
+		    _points.AddRange(points);
+		}
 
     public string StringValue()
     {
@@ -36,14 +43,17 @@ public class Line : IFigure
             Update();
         }
 
-        //Update();
-
         return _text;
     }
 
     private int GetPointsHashCode()
     {
-        return Points.Aggregate(0, (acc, p) => acc + p.GetHashCode());
+        var result = 0;                                                             for (int i = 0; i < _points.Count; i++)
+        {
+          result += _points[i].GetHashCode();
+        }
+
+        return result;
     }
 
     private void Update()

@@ -14,6 +14,20 @@ using Test;
 const int rows = 25;
 const int columns = 76;
 
+const float ox = 8;
+const float oy = ox / 2;
+
+var bezier = new Bezier(new IReadOnlyVector2<float>[] {
+	new Vector2(ox, oy),
+	new Vector2(ox, rows - oy),
+	new Vector2(columns - ox, oy),
+	new Vector2(columns - ox, rows - oy)
+}, Constants.White);
+
+//bezier.StringValue();
+
+//return;
+
 static string CreateFrame()
 {
     var builder = new StringBuilder(columns * rows);
@@ -56,7 +70,7 @@ var sch2 = new SchemeView(new Vector2(0, 0), new Vector2(columns, rows));
 var frame = new Item(CreateFrame(), Vector2.Zero, false, Constants.White);
 var fps = new Item("AVG 0 (0 ms)", Vector2.One, false, Constants.White);
 
-var ticker = new Ticker(60);
+var ticker = new Ticker(4);
 
 /*var n1 = new NodeTrue();
 var ng = new NodeGenerate(4);
@@ -246,6 +260,7 @@ ticker.AddListener(nl2);*/
 
 //canvas.Append(sch1.Visual);
 canvas.Append(sch2.Visual);
+canvas.Append(bezier);
 //canvas.Append(new Line(new IReadOnlyVector2<float>[] { new Vector2(0, 14), new Vector2(columns, 14) }, Constants.White));
 canvas.Append(frame);
 canvas.Append(fps);
