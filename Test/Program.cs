@@ -256,7 +256,8 @@ var frames = 0;
 var total = 0.0f;
 while (true)
 {
-		var deltaTime = timer.ElapsedMilliseconds / 1000f;
+	var elapsed = timer.ElapsedTicks;
+	var deltaTime = elapsed / 10000000f;
 
     ticker.Update(deltaTime);
     timer.Restart();
@@ -264,14 +265,14 @@ while (true)
     total += deltaTime;
     frames++;
 
-		while (total >= 1)
-		{
-				var totalDelta = total / frames;
+	if (total >= 1)
+	{
+		var totalDelta = total / frames;
 		
-    		fps.Text = $"AVG {MathExtensions.Round(1 / totalDelta)} ({MathExtensions.Round(totalDelta * 1000, 2)} ms)";
+    	fps.Text = $"AVG {MathExtensions.Round(1 / totalDelta)} ({MathExtensions.Round(totalDelta * 1000, 2)} ms)";
 
-    		total -= 1;
-    		frames = 0;
+    	total = 0;
+    	frames = 0;
     }
 
     Console.WriteLine(canvas.StringValue());

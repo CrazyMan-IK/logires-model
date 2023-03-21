@@ -8,31 +8,32 @@ namespace BrailleCanvas;
 
 public class Canvas
 {
+    private const int _ColorsCount = 4;
+
+    private readonly (OneOf<Color, IHasValue<Color>>[], int, char)[,] _matrix;
     private readonly List<(int, IFigure)> _items = new List<(int, IFigure)>();
+    private readonly bool _canOverflow = false;
+    private readonly StringBuilder _result;
     private int _topZ = 0;
-    private bool _canOverflow = false;
-    private (List<OneOf<Color, IHasValue<Color>>>, char)[,] _matrix;
-    //private List<Color>[,] _cmatrix;
-    private StringBuilder _result;
 
     public Canvas(IReadOnlyVector2<int> size, bool canOverflow = false)
     {
         Size = size;
         _canOverflow = canOverflow;
 
-        _matrix = new (List<OneOf<Color, IHasValue<Color>>>, char)[Size.Y, Size.X];
+        _matrix = new (OneOf<Color, IHasValue<Color>>[], int, char)[Size.Y, Size.X];
         //_cmatrix = new List<Color>[Size.Y, Size.X];
 
         for (int i = 0; i < _matrix.GetLength(0); i++)
         {
             for (int j = 0; j < _matrix.GetLength(1); j++)
             {
-                _matrix[i, j] = (new List<OneOf<Color, IHasValue<Color>>>(), '\u2800');
+                _matrix[i, j] = (new OneOf<Color, IHasValue<Color>>[_ColorsCount], 0, '\u2800');
                 //_cmatrix[i, j] = new List<Color>();
             }
         }
 
-        _result = new StringBuilder((Size.X * Size.Y) * 2);
+        _result = new StringBuilder(Size.X * Size.Y * 2);
     }
 
     public IReadOnlyVector2<int> Size { get; private set; }
@@ -75,8 +76,8 @@ public class Canvas
         {
             for (int j = 0; j < _matrix.GetLength(1); j++)
             {
-                _matrix[i, j].Item1.Clear();
-                _matrix[i, j].Item2 = '\u2800';
+                _matrix[i, j].Item2 = 0;
+                _matrix[i, j].Item3 = '\u2800';
             }
         }
 
@@ -90,7 +91,7 @@ public class Canvas
 
             foreach (var line in lines)
             {
-                Draw(item, _matrix, line, x, y++);
+                Draw(item, line, x, y++);
             }
         }
 
@@ -99,14 +100,15 @@ public class Canvas
         {
             for (int x = 0; x < _matrix.GetLength(1); x++)
             {
-                if (_matrix[y, x].Item2 == '\u2800')
+                var cell = _matrix[y, x];
+
+                if (cell.Item3 == '\u2800')
                 {
-                    _result.Append(_matrix[y, x].Item2);
+                    _result.Append(cell.Item3);
                     continue;
                 }
 
-                
-                var color = ColorExtensions.MixColors(_matrix[y, x].Item1.Select(x => x.Match(x => x, x => x.Value)));
+                var color = ColorExtensions.MixColors(cell.Item1.Take(cell.Item2).Select(x => x.Match(x => x, x => x.Value)));
                 //var color = colors[0];
 
                 //if (colors.Count > 0)
@@ -114,7 +116,7 @@ public class Canvas
                     //console.log(getColorEscapeCharacter(color));
                     //matrix[y][x] = getColorEscapeCharacter(color) + matrix[y][x];
                     _result.Append(color.AsEscapeSequence());
-                    _result.Append(_matrix[y, x].Item2);
+                    _result.Append(cell.Item3);
                 }
             }
 
@@ -148,7 +150,7 @@ public class Canvas
         return x < Size.X || _canOverflow;
     }
 
-    private void Draw(IFigure item, (List<OneOf<Color, IHasValue<Color>>>, char)[,] matrix, string str, int x, int y)
+    private void Draw(IFigure item, string str, int x, int y)
     {
         if (y < 0 || (y > Size.Y - 1 && !_canOverflow))
         {
@@ -182,7 +184,8 @@ public class Canvas
 
             //var chCodeA = (int)chr;//chr.charCodeAt(0);
             //var chCodeB = (matrix[y, x]?.GetCharCode() ?? 0x2800);//.charCodeAt(0);
-            var oldChr = matrix[y, x].Item2;
+            var cell = _matrix[y, x];
+            var oldChr = cell.Item3;
 
             var result = '\0';
             if (chr >= 0x2800 && chr <= 0x28ff && oldChr >= 0x2800 && oldChr <= 0x28ff)
@@ -221,18 +224,20 @@ public class Canvas
             }
             else
             {
-            		result = oldChr;
+            	result = oldChr;
             }
 
             //result = chr;
 
-            matrix[y, x].Item2 = result;
+            cell.Item3 = result;
 
-            if (chr != 0x2800)
+            if (chr != 0x2800 && cell.Item2 < _ColorsCount)
             {
                 //console.log(`"${result}" "x: ${i}"\t"y: ${y}"\t"${JSON.stringify(item.color)}"`);
-                matrix[y, x].Item1.Add(item.Color);
+                cell.Item1[cell.Item2++] = item.Color;
             }
+
+            _matrix[y, x] = cell;
 
             /*if (item.isInside({ x: i, y: y })) {
               matrix[y][i] = chr;
