@@ -12,7 +12,7 @@ public class Bezier : IFigure
     private char[] _result = Array.Empty<char>();
     private string _text = "";
     private int _oldPointsHash = 0;
-    private bool _isFirstTime = true;
+    //private bool _isFirstTime = true;
 
     public Bezier(IEnumerable<IReadOnlyVector2<float>> points, OneOf<Color, IHasValue<Color>> color, bool isSmoothed = true)
     {
@@ -36,7 +36,7 @@ public class Bezier : IFigure
     		_points.Clear();
         _points.AddRange(points);
 
-        _isFirstTime = true;
+        //_isFirstTime = true;
     }
 
     public string StringValue()
@@ -65,22 +65,7 @@ public class Bezier : IFigure
 
     private void Update()
     {
-				/*const beziers: CBezier[] = [];
-		    for (let i = 0; i < points.length; i += 3) {
-		      const ps = points.slice(i, i + 4);
-		
-		      if (ps.length < 2) {
-		        break;
-		      }
-		
-		      //console.log(ps);
-		      beziers.push(new CBezier(ps));
-		    }
-		    const getP = (i: number) => {
-		      return beziers[Math.floor(i)].get(mod(i, 1 + figureTStep));
-		    };*/
-
-		    if (_isFirstTime &&	IsSmoothed)
+		    /*if (_isFirstTime &&	IsSmoothed)
 		    {
 		    	for (int i = 3; i < _points.Count; i += 3)
 		    	{
@@ -91,12 +76,30 @@ public class Bezier : IFigure
 		    			_points.Insert(i, newPoint);
 		    		}
 		    	}
+
+		    	_isFirstTime = false;
+		    }*/
+
+		    var points = _points;
+		    if (IsSmoothed)
+		    {
+		    	points = new List<IReadOnlyVector2<float>>(_points);
+
+		    	for (int i = 3; i < points.Count; i += 3)
+		    	{
+		    		var ps = points.Skip(i - 1).Take(5).ToArray();
+		    		if (ps.Length > 2 && ps.Length < 5)
+		    		{
+		    			var newPoint = new Vector2((ps[0].X + ps[1].X) * 0.5f, (ps[0].Y + ps[1].Y) * 0.5f);
+		    			points.Insert(i, newPoint);
+		    		}
+		    	}
 		    }
 		    
 		    var beziers = new List<IReadOnlyVector2<float>[]>();
-		    for (int i = 0; i < _points.Count; i += 3)
+		    for (int i = 0; i < points.Count; i += 3)
 		    {
-		    	var ps = _points.Skip(i).Take(4).ToArray();
+		    	var ps = points.Skip(i).Take(4).ToArray();
 
 		    	if (ps.Length < 2)
 		    	{
@@ -106,7 +109,7 @@ public class Bezier : IFigure
 		    	beziers.Add(ps);
 		    }
     
-        var bbox = _points.Aggregate(new BBox(), (acc, p) =>
+        var bbox = points.Aggregate(new BBox(), (acc, p) =>
         {
             var newMin = new Vector2(Math.Min(p.X, acc.Min.X), Math.Min(p.Y, acc.Min.Y));
             var newMax = new Vector2(Math.Max(p.X, acc.Max.X), Math.Max(p.Y, acc.Max.Y));
@@ -187,40 +190,7 @@ public class Bezier : IFigure
 				var bezier = beziers[(int)MathF.Floor(i)];
 				var t = MathExtensions.Mod(i, 1 + Constants.FigureTimeStep);
 
-    		IReadOnlyVector2<float> result;
-				if (bezier.Length == 2)
-				{
-					var p1 = bezier[0];
-					var p2 = bezier[1];
-				
-					result = Vector2Extensions.Lerp(p1, p2, t);
-				}
-				else if (bezier.Length == 3)
-				{
-					var p1 = bezier[0];
-					var p2 = bezier[1];
-					var p3 = bezier[2];
-
-					result = p1.Multiply(MathF.Pow(1 - t, 2)) +
-									 p2.Multiply(2 * t * (1 - t)) +
-									 p3.Multiply(MathF.Pow(t, 2));
-				}
-				else if (bezier.Length == 4)
-				{
-					var p1 = bezier[0];
-					var p2 = bezier[1];
-					var p3 = bezier[2];
-					var p4 = bezier[3];
-
-					result = p1.Multiply(MathF.Pow(1 - t, 3)) +
-									 p2.Multiply(3 * t * MathF.Pow(1 - t, 2)) +
-									 p3.Multiply(3 * MathF.Pow(t, 2) * (1 - t)) +
-									 p4.Multiply(MathF.Pow(t, 3));
-				}
-				else
-				{
-					throw new ArgumentOutOfRangeException(nameof(bezier));
-				}
+    		IReadOnlyVector2<float> result = GetBezierPoint(bezier, t);
 
 				return new Vector2(result.X - cPositionX, result.Y - cPositionY);;
     
@@ -230,6 +200,41 @@ public class Bezier : IFigure
         var result = Vector2Extensions.Lerp(p1, p2, MathExtensions.Mod(i, 1 + Constants.FigureTimeStep));
 
         return new Vector2(result.X - cPositionX, result.Y - cPositionY);*/
+    }
+
+    private static IReadOnlyVector2<float> GetBezierPoint(IReadOnlyVector2<float>[] bezier, float t)
+    {
+    	if (bezier.Length == 2)
+			{
+				var p1 = bezier[0];
+				var p2 = bezier[1];
+			
+				return Vector2Extensions.Lerp(p1, p2, t);
+			}
+			else if (bezier.Length == 3)
+			{
+				var p1 = bezier[0];
+				var p2 = bezier[1];
+				var p3 = bezier[2];
+
+				return p1.Multiply(MathF.Pow(1 - t, 2)) +
+							 p2.Multiply(2 * t * (1 - t)) +
+							 p3.Multiply(MathF.Pow(t, 2));
+			}
+			else if (bezier.Length == 4)
+			{
+				var p1 = bezier[0];
+				var p2 = bezier[1];
+				var p3 = bezier[2];
+				var p4 = bezier[3];
+
+				return p1.Multiply(MathF.Pow(1 - t, 3)) +
+							 p2.Multiply(3 * t * MathF.Pow(1 - t, 2)) +
+							 p3.Multiply(3 * MathF.Pow(t, 2) * (1 - t)) +
+							 p4.Multiply(MathF.Pow(t, 3));
+			}
+			
+			throw new ArgumentOutOfRangeException(nameof(bezier));
     }
 
     /*
