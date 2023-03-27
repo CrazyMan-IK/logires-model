@@ -133,13 +133,13 @@ public struct Vector2Int : IReadOnlyVector2<int>
     {
         return new Vector2Int(X - b.X, Y - b.Y);
     }
-    public IReadOnlyVector2<int> Multiply(float b)
+    public IReadOnlyVector2<int> Multiply(int b)
     {
-        return new Vector2Int((int)MathExtensions.Round(X * b), (int)MathExtensions.Round(Y * b));
+        return new Vector2Int(X * b, Y * b);
     }
-    public IReadOnlyVector2<int> Divide(float b)
+    public IReadOnlyVector2<int> Divide(int b)
     {
-        return new Vector2Int((int)MathExtensions.Round(X / b), (int)MathExtensions.Round(Y / b));
+        return new Vector2Int(X / b, Y / b);
     }
 
     public override string ToString()

@@ -13,6 +13,8 @@ using Test;
 
 const int rows = 25;
 const int columns = 76;
+const float hrows = rows / 2.0f;
+const float hcolumns = columns / 2.0f;
 
 static string CreateFrame()
 {
@@ -56,7 +58,7 @@ var sch2 = new SchemeView(new Vector2(0, 0), new Vector2(columns, rows));
 var frame = new Item(CreateFrame(), Vector2.Zero, false, Constants.White);
 var fps = new Item("AVG 0 (0 ms)", Vector2.One, false, Constants.White);
 
-var ticker = new Ticker(60);
+var ticker = new Ticker(4);
 
 /*var n1 = new NodeTrue();
 var ng = new NodeGenerate(4);
@@ -244,8 +246,42 @@ ticker.AddListener(nl2);*/
     canvas.Append(node.Visual);
 }*/
 
+var p1 = new Vector2(10, 12);
+var p2 = new RefVector2();
+var p3 = new RefVector2();
+var p4 = new Vector2(columns - 10, rows - 12);
+var p5 = new Vector2(columns - 10, rows - 2);
+var p6 = new Vector2(columns - 40, rows - 4);
+
+var b1 = new Bezier(new IReadOnlyVector2<float>[] { p1, p2, p3 }, Constants.Red);
+var b2 = new Bezier(new IReadOnlyVector2<float>[] { p1, p2, p3, p4 }, Constants.Green);
+var b3 = new Bezier(new IReadOnlyVector2<float>[] { p1, p2, p3, p4, p5 }, Constants.Blue);
+var b4 = new Bezier(new IReadOnlyVector2<float>[] { p1, p2, p3, p4, p5, p6 }, Constants.White);
+
+float t = 0;
+void UpdatePoints(float deltaTime)
+{
+	t += deltaTime;
+
+	p2.X = 25 + MathF.Sin(t + MathF.PI) * 10;
+	p2.Y = hrows + MathF.Cos(t + MathF.PI) * hrows;
+	p3.X = 40 + MathF.Sin(t) * 20;
+	p3.Y = hrows + MathF.Cos(t) * hrows;
+
+	//b1.SetPoints(new IReadOnlyVector2<float>[] { p1, p2, p3 });
+	//b2.SetPoints(new IReadOnlyVector2<float>[] { p1, p2, p3, p4 });
+	//b3.SetPoints(new IReadOnlyVector2<float>[] { p1, p2, p3, p4, p5 });
+	//b4.SetPoints(new IReadOnlyVector2<float>[] { p1, p2, p3, p4, p5, p6 });
+}
+
+UpdatePoints(0);
+
 //canvas.Append(sch1.Visual);
 canvas.Append(sch2.Visual);
+canvas.Append(b1);
+canvas.Append(b2);
+canvas.Append(b3);
+canvas.Append(b4);
 //canvas.Append(new Line(new IReadOnlyVector2<float>[] { new Vector2(0, 14), new Vector2(columns, 14) }, Constants.White));
 canvas.Append(frame);
 canvas.Append(fps);
@@ -256,23 +292,24 @@ var frames = 0;
 var total = 0.0f;
 while (true)
 {
-	var elapsed = timer.ElapsedTicks;
-	var deltaTime = elapsed / 10000000f;
+    var elapsed = timer.ElapsedTicks;
+    var deltaTime = elapsed * 1.0f / Stopwatch.Frequency;
 
     ticker.Update(deltaTime);
+    UpdatePoints(deltaTime);
     timer.Restart();
 
     total += deltaTime;
     frames++;
 
-	if (total >= 1)
-	{
-		var totalDelta = total / frames;
+    if (total >= 1)
+    {
+        var totalDelta = total / frames;
 		
-    	fps.Text = $"AVG {MathExtensions.Round(1 / totalDelta)} ({MathExtensions.Round(totalDelta * 1000, 2)} ms)";
+        fps.Text = $"AVG {MathExtensions.Round(1 / totalDelta)} ({MathExtensions.Round(totalDelta * 1000, 2)} ms)";
 
-    	total = 0;
-    	frames = 0;
+        total = 0;
+        frames = 0;
     }
 
     Console.WriteLine(canvas.StringValue());
