@@ -95,6 +95,11 @@ public class Bezier : IFigure
 		    		}
 		    	}
 		    }
+
+		    /*Console.WriteLine(string.Join("; ", _points));
+		    Console.WriteLine();
+		    Console.WriteLine(string.Join("; ", points));
+		    Console.WriteLine();*/
 		    
 		    var beziers = new List<IReadOnlyVector2<float>[]>();
 		    for (int i = 0; i < points.Count; i += 3)
@@ -109,19 +114,31 @@ public class Bezier : IFigure
 		    	beziers.Add(ps);
 		    }
     
-        var bbox = points.Aggregate(new BBox(), (acc, p) =>
+        var bbox = beziers.Aggregate(new BBox(), (acc, bezier) =>
         {
-            var newMin = new Vector2(Math.Min(p.X, acc.Min.X), Math.Min(p.Y, acc.Min.Y));
-            var newMax = new Vector2(Math.Max(p.X, acc.Max.X), Math.Max(p.Y, acc.Max.Y));
+        	var bbox = bezier.Length == 4 ? GetCBezierBBox(bezier) :
+        						 bezier.Length == 3 ? GetQBezierBBox(bezier) :
+        						 GetLineBBox(bezier);
 
-            acc.Min = newMin;
-            acc.Max = newMax;
+					//Console.WriteLine(bbox);
+        	
+          var newMin = new Vector2(Math.Min(bbox.Min.X, acc.Min.X), Math.Min(bbox.Min.Y, acc.Min.Y));
+          var newMax = new Vector2(Math.Max(bbox.Max.X, acc.Max.X), Math.Max(bbox.Max.Y, acc.Max.Y));
 
-            return acc;
+          acc.Min = newMin;
+          acc.Max = newMax;
+
+          return acc;
         });
 
-        Position = bbox.Min;
-        Size = new Vector2(MathF.Abs(bbox.Max.X - bbox.Min.X), MathF.Abs(bbox.Max.Y - bbox.Min.Y));
+        //Console.WriteLine(bbox);
+
+        var min = bbox.Min;
+        min.Y -= 1;
+
+        Position = min;
+        //Size = new Vector2(MathF.Abs(bbox.Max.X - bbox.Min.X), MathF.Abs(bbox.Max.Y - bbox.Min.Y));
+        Size = new Vector2(bbox.Max.X - bbox.Min.X, bbox.Max.Y - bbox.Min.Y);
 
         var cPositionX = (int)MathF.Ceiling(Position.X);
         var cPositionY = (int)MathF.Ceiling(Position.Y);
@@ -130,7 +147,7 @@ public class Bezier : IFigure
         var cSizeY = (int)MathF.Ceiling(Size.Y);
 
         var aSizeX = cSizeX + 2;
-        var aSizeY = cSizeY + 1;
+        var aSizeY = cSizeY + 2;
 
         _result = new char[aSizeX * aSizeY];
         for (int i = 0; i < aSizeY; i++)
@@ -150,7 +167,7 @@ public class Bezier : IFigure
         var accum = 0;
         for (float i = 0; i <= beziers.Count; i += Constants.FigureTimeStep)
         {
-            var point = GetPoint(beziers, i, cPositionX, cPositionY);
+            var point = GetPoint(beziers, i, MathF.Round(Position.X), MathF.Round(Position.Y) + 0.5f);
             //Console.WriteLine(point);
             //const curY = lerp(start.y, end.y, i);
 
@@ -170,6 +187,8 @@ public class Bezier : IFigure
             //Console.WriteLine(new Vector2(cellX, cellY));
 
             var index = (int)MathF.Truncate(cellX + cellY * (cSizeX + 1) + cellY);
+
+						//if (index >= _result.Length) continue;
 
             //const index = Math.trunc(cellX + cellY * (size.x * 2 + 1) + cellY);
             var oldCode = _result[index] - 0x2800;
@@ -192,7 +211,7 @@ public class Bezier : IFigure
 
     		IReadOnlyVector2<float> result = GetBezierPoint(bezier, t);
 
-				return new Vector2(result.X - cPositionX, result.Y - cPositionY);;
+				return new Vector2(result.X - cPositionX, result.Y - cPositionY);
     
         /*var p1 = points[(int)MathF.Floor(i)];
         var p2 = points[(int)MathF.Floor(i) + 1];
@@ -236,6 +255,131 @@ public class Bezier : IFigure
 			
 			throw new ArgumentOutOfRangeException(nameof(bezier));
     }
+
+    private static BBox GetLineBBox(IReadOnlyVector2<float>[] line)
+    {
+      var p0 = line[0];
+      var p1 = line[1];
+
+      return new BBox()
+      {
+        Min = new Vector2(Math.Min(p0.X, p1.X), Math.Min(p0.Y, p1.Y)),
+        Max = new Vector2(Math.Max(p0.X, p1.X), Math.Max(p0.Y, p1.Y))
+      };
+    }
+
+    private static BBox GetQBezierBBox(IReadOnlyVector2<float>[] bezier)
+    {
+			var p0 = bezier[0];
+			var p1 = bezier[1];
+			var p2 = bezier[2];
+    
+    	// Calculate the t values where the derivative is zero
+ 	    float tx = (p0.X - p1.X) / (p0.X - 2 * p1.X + p2.X);
+ 	    float ty = (p0.Y - p1.Y) / (p0.Y - 2 * p1.Y + p2.Y);
+ 	
+ 	    // Calculate the corresponding x and y coordinates
+ 	    float xMin = Math.Min(p0.X, p2.X);
+ 	    float xMax = Math.Max(p0.X, p2.X);
+ 	    float yMin = Math.Min(p0.Y, p2.Y);
+ 	    float yMax = Math.Max(p0.Y, p2.Y);
+ 	
+ 	    if (0 <= tx && tx <= 1)
+ 	    {
+ 	        float x = (1 - tx) * (1 - tx) * p0.X + 2 * (1 - tx) * tx * p1.X + tx * tx * p2.X;
+ 	        xMin = Math.Min(xMin, x);
+ 	        xMax = Math.Max(xMax, x);
+ 	    }
+ 	
+ 	    if (0 <= ty && ty <= 1)
+ 	    {
+ 	        float y = (1 - ty) * (1 - ty) * p0.Y + 2 * (1 - ty) * ty * p1.Y + ty * ty * p2.Y;
+ 	        yMin = Math.Min(yMin, y);
+ 	        yMax = Math.Max(yMax, y);
+ 	    }
+
+ 	    return new BBox()
+ 	    {
+ 	    	Min = new Vector2(xMin, yMin),
+ 	    	Max = new Vector2(xMax, yMax)
+ 	    };
+    }
+    
+    private static BBox GetCBezierBBox(IReadOnlyVector2<float>[] bezier)
+    {
+			static float Bezier(float t, float p0, float p1, float p2, float p3)
+			{
+			    float mt = 1 - t;
+			    return mt * mt * mt * p0 + 3 * mt * mt * t * p1 + 3 * mt * t * t * p2 + t * t * t * p3;
+			}
+    
+			var p0 = bezier[0];
+			var p1 = bezier[1];
+			var p2 = bezier[2];
+			var p3 = bezier[3];
+
+ 	    float t;
+      List<float> x = new List<float>() { p0.X, p3.X };
+      List<float> y = new List<float>() { p0.Y, p3.Y };
+  
+      // Calculate derivative for X
+      float a = -3 * p0.X + 9 * p1.X - 9 * p2.X + 3 * p3.X;
+      float b = 6 * p0.X - 12 * p1.X + 6 * p2.X;
+      float c = -3 * p0.X + 3 * p1.X;
+  
+      // Calculate roots for X
+      float discriminant = b * b - 4 * a * c;
+      if (discriminant >= 0)
+      {
+          discriminant = (float)Math.Sqrt(discriminant);
+          t = (-b - discriminant) / (2 * a);
+          if (t > 0 && t < 1) x.Add(Bezier(t, p0.X, p1.X, p2.X, p3.X));
+          t = (-b + discriminant) / (2 * a);
+          if (t > 0 && t < 1) x.Add(Bezier(t, p0.X, p1.X, p2.X, p3.X));
+      }
+  
+      // Calculate derivative for Y
+      a = -3 * p0.Y + 9 * p1.Y - 9 * p2.Y + 3 * p3.Y;
+      b = 6 * p0.Y - 12 * p1.Y + 6 * p2.Y;
+      c = -3 * p0.Y + 3 * p1.Y;
+  
+      // Calculate roots for Y
+      discriminant = b * b - 4 * a * c;
+      if (discriminant >= 0)
+      {
+          discriminant = (float)Math.Sqrt(discriminant);
+          t = (-b - discriminant) / (2 * a);
+          if (t > 0 && t < 1) y.Add(Bezier(t, p0.Y, p1.Y, p2.Y, p3.Y));
+          t = (-b + discriminant) / (2 * a);
+          if (t > 0 && t < 1) y.Add(Bezier(t, p0.Y, p1.Y, p2.Y, p3.Y));
+      }
+ 	
+ 	    // Return the bounding box
+ 	    return new BBox()
+ 	    {
+ 	    	Min = new Vector2(x.Min(), y.Min()),
+ 	    	Max = new Vector2(x.Max(), y.Max())
+ 	    };
+ 		}
+ 	
+ 		private static float[] SolveCubic(float a, float b, float c)
+ 		{
+ 	    // Calculate the discriminant
+ 	    float d = b * b - 4 * a * c;
+ 	
+ 	    // If the discriminant is negative, there are no real roots
+ 	    if (d < 0)
+ 	    {
+ 	      return new float[0];
+ 	    }
+ 	
+ 	    // Calculate the two roots
+ 	    float sqrtD = (float)Math.Sqrt(d);
+ 	    float t1 = (-b - sqrtD) / (2 * a);
+ 	    float t2 = (-b + sqrtD) / (2 * a);
+ 	
+ 	    return new float[] { t1, t2 };
+ 		}
 
     /*
 		function evalBez(poly, t) {

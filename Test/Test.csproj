@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="dotnet-curses" Version="1.0.2" />
     <PackageReference Include="OneOf" Version="3.0.203" />
   </ItemGroup>
 

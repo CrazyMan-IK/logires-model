@@ -1,5 +1,6 @@
 using System.Text;
 using System.Diagnostics;
+using Mindmagma.Curses;
 using BrailleCanvas;
 using BrailleCanvas.Interfaces;
 using BrailleCanvas.Extensions;
@@ -11,12 +12,12 @@ using Logires.Nodes;
 using Logires.Pins;
 using Test;
 
-const int rows = 25;
-const int columns = 76;
-const float hrows = rows / 2.0f;
-const float hcolumns = columns / 2.0f;
+int columns = Console.WindowWidth;
+int rows = (int)Math.Round(Console.WindowWidth * 0.31);
+float hcolumns = columns / 2.0f;
+float hrows = rows / 2.0f;
 
-static string CreateFrame()
+string CreateFrame()
 {
     var builder = new StringBuilder(columns * rows);
 
@@ -30,9 +31,11 @@ static string CreateFrame()
     var empty = new string('\u2800', xCount);
     for (int i = 0; i < yCount; i++)
     {
-        builder.Append('|');
+        builder.Append(i % 10);
+        //builder.Append('|');
         builder.Append(empty);
         builder.Append("|\n");
+        //builder.Append($"{i % 10}\n");
     }
 
     builder.Append('+');
@@ -42,6 +45,10 @@ static string CreateFrame()
     return builder.ToString();
 }
 
+Console.Write(new string('\n', Console.WindowHeight));
+Console.SetCursorPosition(0, 0);
+//OnExit();
+
 Console.OutputEncoding = Encoding.UTF8;
 Console.CursorVisible = false;
 AppDomain.CurrentDomain.ProcessExit += (s, e) => OnExit();
@@ -49,6 +56,13 @@ Console.CancelKeyPress += (s, e) => OnExit();
 
 static void OnExit()
 {
+		//Console.WriteLine(Console.WindowHeight);
+		/*Console.Write(new string('\n', Console.WindowHeight));
+		Console.SetCursorPosition(0, 0);*/
+		Console.Clear();
+
+		Console.SetCursorPosition(0, 0);//-Console.WindowHeight);
+
     Console.CursorVisible = true;
 }
 
@@ -276,20 +290,29 @@ void UpdatePoints(float deltaTime)
 
 UpdatePoints(0);
 
-//canvas.Append(sch1.Visual);
+////canvas.Append(sch1.Visual);
 canvas.Append(sch2.Visual);
 canvas.Append(b1);
 canvas.Append(b2);
 canvas.Append(b3);
 canvas.Append(b4);
-//canvas.Append(new Line(new IReadOnlyVector2<float>[] { new Vector2(0, 14), new Vector2(columns, 14) }, Constants.White));
+////canvas.Append(new Line(new IReadOnlyVector2<float>[] { new Vector2(0, 14), new Vector2(columns, 14) }, Constants.White));
 canvas.Append(frame);
 canvas.Append(fps);
+
+//Console.WriteLine(canvas.StringValue());
+//Console.SetCursorPosition(-1, -1);
+
+Multicaster.Instance.MessageReceived += (message) =>
+{
+	Console.WriteLine(message);
+};
 
 Console.Clear();
 var timer = Stopwatch.StartNew();
 var frames = 0;
 var total = 0.0f;
+var totalFrames = 0;
 while (true)
 {
     var elapsed = timer.ElapsedTicks;
@@ -301,6 +324,12 @@ while (true)
 
     total += deltaTime;
     frames++;
+    totalFrames++;
+
+    if ((totalFrames % 30) == 0)
+    {
+    	Multicaster.Instance.BroadcastMessage(new Message() { ID = "ABOBA", Value = "Test" });
+    }
 
     if (total >= 1)
     {
