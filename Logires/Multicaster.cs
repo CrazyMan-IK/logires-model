@@ -7,15 +7,16 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Runtime.Serialization.Formatters.Binary;
+//using System.Runtime.Serialization.Formatters.Binary;
+using ZeroFormatter;
 
 namespace Logires
 {
-		[Serializable]
-		public sealed class Message
+		[ZeroFormattable]
+		public class Message
 		{
-		    public string ID { get; set; }
-		    public object Value { get; set; }
+		    [Index(0)] public virtual string ID { get; set; } = "default";
+		    [Index(1)] public virtual List<bool>? Value { get; set; }
 		}
 
     public sealed class Multicaster
@@ -24,12 +25,12 @@ namespace Logires
         public static readonly IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Any, port);
         public static readonly IPAddress multicastAddress = IPAddress.Parse("224.0.0.1");
         public static readonly IPEndPoint remoteEndPoint = new IPEndPoint(multicastAddress, port);
+        
+        public event Action<IPAddress, Message>? MessageReceived;
 
-        public event Action<Message> MessageReceived;
-
-        private UdpClient _client = null;
-        private IPEndPoint _lastReceivedIP = new IPEndPoint(0, 0);
         private static Multicaster _instance = null;
+        private readonly UdpClient _client = null;
+        private IPEndPoint _lastReceivedIP = new IPEndPoint(0, 0);
 
         public static Multicaster Instance
         {
@@ -62,13 +63,14 @@ namespace Logires
             	  		{
             	      		var data = _client.Receive(ref _lastReceivedIP);
             	      
-            	      		var mS = new MemoryStream(data);
+            	      		/*var mS = new MemoryStream(data);
             	      		var bF = new BinaryFormatter();
-            	      		var message = (Message)bF.Deserialize(mS);
+            	      		var message = (Message)bF.Deserialize(mS);*/
+            	      		var message = ZeroFormatterSerializer.Deserialize<Message>(data);
 
-            	      		Console.WriteLine("Message received");
+            	      		//Console.WriteLine("Message received");
             	      
-            	  				MessageReceived?.Invoke(message);
+            	  				MessageReceived?.Invoke(_lastReceivedIP.Address, message);
             	  		}
             	  		catch (Exception ex)
             	  		{
@@ -89,12 +91,13 @@ namespace Logires
 
         public void BroadcastMessage(Message message)
         {
-            var mS = new MemoryStream();
+            /*var mS = new MemoryStream();
             var bF = new BinaryFormatter();
             bF.Serialize(mS, message);
-            var data = mS.GetBuffer();
+            var data = mS.GetBuffer();*/
+            var data = ZeroFormatterSerializer.Serialize(message);
 
-            Console.WriteLine("Message sended");
+            //Console.WriteLine("Message sended");
 
             _client.Send(data, data.Length, remoteEndPoint);
         }

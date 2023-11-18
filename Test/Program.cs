@@ -303,16 +303,10 @@ canvas.Append(fps);
 //Console.WriteLine(canvas.StringValue());
 //Console.SetCursorPosition(-1, -1);
 
-Multicaster.Instance.MessageReceived += (message) =>
-{
-	Console.WriteLine(message);
-};
-
 Console.Clear();
 var timer = Stopwatch.StartNew();
 var frames = 0;
 var total = 0.0f;
-var totalFrames = 0;
 while (true)
 {
     var elapsed = timer.ElapsedTicks;
@@ -324,12 +318,6 @@ while (true)
 
     total += deltaTime;
     frames++;
-    totalFrames++;
-
-    if ((totalFrames % 30) == 0)
-    {
-    	Multicaster.Instance.BroadcastMessage(new Message() { ID = "ABOBA", Value = "Test" });
-    }
 
     if (total >= 1)
     {
