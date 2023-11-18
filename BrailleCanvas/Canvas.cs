@@ -177,6 +177,13 @@ public class Canvas
 
         foreach (var chr in str)
         {
+            if (x < 0)
+            {
+                x++;
+
+                continue;
+            }
+
             if (!IsInBounds(x))
             {
                 break;

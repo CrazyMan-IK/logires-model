@@ -1,5 +1,4 @@
 using Logires.Pins;
-
 using Logires.Interfaces;
 
 namespace Logires.Nodes;
@@ -25,8 +24,8 @@ public class RemoteInput : Remote, IHaveInputs
     {
         Multicaster.Instance.BroadcastMessage(new Message()
         {
-        	ID = Name,
-        	Value = _input.Value
+            ID = Name,
+            Value = _input.Value
         });
     }
 }

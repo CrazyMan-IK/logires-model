@@ -50,7 +50,7 @@ public class Ellipse : IFilledFigure
         var cPositionX = MathF.Ceiling(Position.X);
         var cPositionY = MathF.Ceiling(Position.Y);
 
-        var cSizeX = MathF.Ceiling(Size.X);
+        var cSizeX = MathF.Ceiling(Size.X) + 1;
         var cSizeY = MathF.Ceiling(Size.Y);
 
         for (int i = 0; i < cSizeY + 1; i++)

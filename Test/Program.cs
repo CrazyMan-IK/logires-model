@@ -86,12 +86,17 @@ var imn = new IteratorMoveNext();*/
 var ng1 = new NodeGenerate(1);
 var ng2 = new NodeGenerate(2);
 var ng3 = new NodeGenerate(4);
+var ng4 = new NodeGenerate(2);
 
 var bm1 = new BitMerger();
 var bm2 = new BitMerger();
 
 var nl1 = new NodeLog();
-//var nl2 = new NodeLog();
+var nl2 = new NodeLog();
+
+var ri1 = new RemoteInput();
+
+var ro1 = new RemoteOutput();
 
 /*var sch2 = new Scheme(new List<Node>() {
 	ng1,
@@ -163,16 +168,24 @@ sch2.Add(new NodeView(ng2, new Vector2(20, 12), Constants.Purple));
 sch2.Add(new NodeView(sch1.Scheme, new Vector2(38, 12), Constants.Yellow));
 sch2.Add(new NodeView(nl1, new Vector2(56, 12), Constants.Purple));
 
+sch2.Add(new NodeView(ro1, new Vector2(20, 4), Constants.Purple));
+sch2.Add(new NodeView(nl2, new Vector2(31.25f, 4), Constants.Purple));
+sch2.Add(new NodeView(ng4, new Vector2(44.75f, 4), Constants.Purple));
+sch2.Add(new NodeView(ri1, new Vector2(56, 4), Constants.Purple));
+
+ro1.Outputs.ElementAt(4).Connect(nl2.Inputs.ElementAt(0));
+ng4.Outputs.ElementAt(0).Connect(ri1.Inputs.ElementAt(0));
+
 ng1.Outputs.ElementAt(0).Connect(bm1.Inputs.ElementAt(0));
 //ng2.Outputs.ElementAt(0).Connect(bm1.Inputs.ElementAt(1));
 bm1.Outputs.ElementAt(0).Connect(bm2.Inputs.ElementAt(0));
 ng3.Outputs.ElementAt(0).Connect(bm2.Inputs.ElementAt(1));
 //bm2.Outputs.ElementAt(0).Connect(nl1.Inputs.ElementAt(0));
 
-var sin = sch1.AddInput<List<bool>>((BitPin)bm1.Inputs.ElementAt(1));
+var sin = sch1.AddInput((BitPin)bm1.Inputs.ElementAt(1));
 sin.Connect(ng2.Outputs.ElementAt(0));
 
-var sout = sch1.AddOutput<List<bool>>((BitPin)bm2.Outputs.ElementAt(0));
+var sout = sch1.AddOutput((BitPin)bm2.Outputs.ElementAt(0));
 sout.Connect(nl1.Inputs.ElementAt(0));
 
 /*ticker.AddListener(ng1);

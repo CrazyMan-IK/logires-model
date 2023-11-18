@@ -122,8 +122,8 @@ public class Bezier : IFigure
 
 					//Console.WriteLine(bbox);
         	
-          var newMin = new Vector2(Math.Min(bbox.Min.X, acc.Min.X), Math.Min(bbox.Min.Y, acc.Min.Y));
-          var newMax = new Vector2(Math.Max(bbox.Max.X, acc.Max.X), Math.Max(bbox.Max.Y, acc.Max.Y));
+          var newMin = new Vector2(MathF.Min(bbox.Min.X, acc.Min.X), MathF.Min(bbox.Min.Y, acc.Min.Y));
+          var newMax = new Vector2(MathF.Max(bbox.Max.X, acc.Max.X), MathF.Max(bbox.Max.Y, acc.Max.Y));
 
           acc.Min = newMin;
           acc.Max = newMax;
@@ -263,8 +263,8 @@ public class Bezier : IFigure
 
       return new BBox()
       {
-        Min = new Vector2(Math.Min(p0.X, p1.X), Math.Min(p0.Y, p1.Y)),
-        Max = new Vector2(Math.Max(p0.X, p1.X), Math.Max(p0.Y, p1.Y))
+        Min = new Vector2(MathF.Min(p0.X, p1.X), MathF.Min(p0.Y, p1.Y)),
+        Max = new Vector2(MathF.Max(p0.X, p1.X), MathF.Max(p0.Y, p1.Y))
       };
     }
 
@@ -279,23 +279,23 @@ public class Bezier : IFigure
  	    float ty = (p0.Y - p1.Y) / (p0.Y - 2 * p1.Y + p2.Y);
  	
  	    // Calculate the corresponding x and y coordinates
- 	    float xMin = Math.Min(p0.X, p2.X);
- 	    float xMax = Math.Max(p0.X, p2.X);
- 	    float yMin = Math.Min(p0.Y, p2.Y);
- 	    float yMax = Math.Max(p0.Y, p2.Y);
+ 	    float xMin = MathF.Min(p0.X, p2.X);
+ 	    float xMax = MathF.Max(p0.X, p2.X);
+ 	    float yMin = MathF.Min(p0.Y, p2.Y);
+ 	    float yMax = MathF.Max(p0.Y, p2.Y);
  	
  	    if (0 <= tx && tx <= 1)
  	    {
  	        float x = (1 - tx) * (1 - tx) * p0.X + 2 * (1 - tx) * tx * p1.X + tx * tx * p2.X;
- 	        xMin = Math.Min(xMin, x);
- 	        xMax = Math.Max(xMax, x);
+ 	        xMin = MathF.Min(xMin, x);
+ 	        xMax = MathF.Max(xMax, x);
  	    }
  	
  	    if (0 <= ty && ty <= 1)
  	    {
  	        float y = (1 - ty) * (1 - ty) * p0.Y + 2 * (1 - ty) * ty * p1.Y + ty * ty * p2.Y;
- 	        yMin = Math.Min(yMin, y);
- 	        yMax = Math.Max(yMax, y);
+ 	        yMin = MathF.Min(yMin, y);
+ 	        yMax = MathF.Max(yMax, y);
  	    }
 
  	    return new BBox()
@@ -331,7 +331,7 @@ public class Bezier : IFigure
       float discriminant = b * b - 4 * a * c;
       if (discriminant >= 0)
       {
-          discriminant = (float)Math.Sqrt(discriminant);
+          discriminant = (float)MathF.Sqrt(discriminant);
           t = (-b - discriminant) / (2 * a);
           if (t > 0 && t < 1) x.Add(Bezier(t, p0.X, p1.X, p2.X, p3.X));
           t = (-b + discriminant) / (2 * a);
@@ -347,7 +347,7 @@ public class Bezier : IFigure
       discriminant = b * b - 4 * a * c;
       if (discriminant >= 0)
       {
-          discriminant = (float)Math.Sqrt(discriminant);
+          discriminant = (float)MathF.Sqrt(discriminant);
           t = (-b - discriminant) / (2 * a);
           if (t > 0 && t < 1) y.Add(Bezier(t, p0.Y, p1.Y, p2.Y, p3.Y));
           t = (-b + discriminant) / (2 * a);
@@ -374,7 +374,7 @@ public class Bezier : IFigure
  	    }
  	
  	    // Calculate the two roots
- 	    float sqrtD = (float)Math.Sqrt(d);
+ 	    float sqrtD = (float)MathF.Sqrt(d);
  	    float t1 = (-b - sqrtD) / (2 * a);
  	    float t2 = (-b + sqrtD) / (2 * a);
  	
